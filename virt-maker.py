@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 import imp
 import json
 import shutil
@@ -93,7 +94,15 @@ class Image:
 
 
 ## For test
-with open('test.vmk','r') as f: filetext = f.read()
+#with open('test.vmk','r') as f: filetext = f.read()
+
+
+## Get vmk contents
+try:
+	with open(sys.argv[-1],'r') as f: filetext = f.read()
+except:
+	print('Cannot open *.vmk file')
+	sys.exit(False)
 
 
 ## Main
