@@ -1,0 +1,5 @@
+#!/bin/bash
+cat virt-maker.py > /usr/bin/virt-maker
+chmod +x /usr/bin/virt-maker
+mkdir -p /var/lib/virt-maker/providers
+yes | cp -r providers/* /var/lib/virt-maker/providers/

@@ -1,0 +1,30 @@
+@image cirros.qcow2
+
+
+@disk
+size=10G
+
+
+@network eth0
+ipaddr=10.0.0.123
+prefix=23
+gateway=10.0.0.1
+dns=10.0.0.1 8.8.8.8
+
+
+@file /etc/somefile
+This is some file
+
+
+
+@shell
+yum install -y someapp1
+
+@shell /bin/bash
+yum install -y someapp2
+
+
+@shell
+yum install -y someapp3
+
+@test
