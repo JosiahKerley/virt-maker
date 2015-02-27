@@ -1,8 +1,8 @@
 ## Fetch and create base image
 @image http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 @sysprep
-@update
-@hostname centos-7-base
+#@update
+#@hostname centos-7-base
 @export centos-7-base
 
 
