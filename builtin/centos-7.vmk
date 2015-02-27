@@ -3,8 +3,7 @@
 @sysprep
 #@update
 #@hostname centos-7-base
-@shell
-echo "Password!" | passwd root --stdin > /dev/null
+@rootpass Password1
 @export centos-7-base
 
 
