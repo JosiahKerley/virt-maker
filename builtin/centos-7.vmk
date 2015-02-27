@@ -12,11 +12,9 @@
 @export test-1
 @create test-1
 connect=qemu:///system
-virt-type=kvm
 name=test-1
 ram=500
 graphics=vnc
-os-variant=centos7
 
 
 ## Create machine "test-2"
