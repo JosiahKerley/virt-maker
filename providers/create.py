@@ -6,6 +6,7 @@ defaults = {
 	"network":"network=default",
 	"graphics":"vnc",
 	"os-variant":"generic",
+	"wait":"10",
 }
 
 import os
@@ -20,8 +21,8 @@ def provider(body,hash,args,verbose,image):
 		cmdargs += ' --%s %s'%(i,defaults[i])
 	cmdargs = cmdargs.replace('<[args]>',os.path.abspath(args))
 	if verbose:
-		cmd = 'virt-install --autostart %s --import'%(cmdargs)
+		cmd = 'virt-install --autostart %s --import --force'%(cmdargs)
 	else:
-		cmd = 'virt-install --autostart -q %s --import'%(cmdargs)
+		cmd = 'virt-install --autostart -q %s --import --force'%(cmdargs)
 	print cmd
 	return(os.system(cmd))
