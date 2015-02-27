@@ -15,7 +15,6 @@ connect=qemu:///system
 virt-type=kvm
 name=test-1
 ram=500
-size=8
 graphics=vnc
 os-variant=centos7
 
@@ -29,6 +28,5 @@ connect=qemu:///system
 virt-type=kvm
 name=test-2
 ram=500
-size=8
 graphics=vnc
 os-variant=centos7
