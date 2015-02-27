@@ -1,12 +1,12 @@
 defaults = {
 	"connect":"qemu:///system",
-	"virt-type":"kvm",
+	#"virt-type":"kvm",
 	"ram":"500",
 	"disk":"path=<[args]>,size=10",
 	"network":"network=default",
 	"graphics":"vnc",
-	"os-variant":"generic",
-	"wait":"10",
+	#"os-variant":"generic",
+	"wait":"3",
 }
 
 import os
