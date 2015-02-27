@@ -171,7 +171,6 @@ for section in dsl2dict(filetext):
 		#print imagepath
 		image.backingimage = imagepath.split('/')[-1]
 		os.chdir('/'.join(imagepath.split('/')[:-1]))
-		os.system('ls')
 		image.setup()
 		chain = image.chain
 		chain.reverse()
