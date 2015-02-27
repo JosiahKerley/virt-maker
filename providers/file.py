@@ -16,4 +16,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-customize    --copy-in "%s:%s" -a %s'%(filename,dest,hash)
 	else:
 		cmd = 'virt-customize -q --copy-in "%s:%s" -a %s'%(filename,dest,hash)
-	os.system(cmd)	
+	return(os.system(cmd))	

@@ -4,4 +4,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-customize --update -a %s'%(hash)
 	else:
 		cmd = 'virt-customize -q --update -a %s'%(hash)
-	os.system(cmd)
+	return(os.system(cmd))

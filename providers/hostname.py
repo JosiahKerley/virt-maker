@@ -4,4 +4,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-customize --hostname %s -a %s'%(args,hash)
 	else:
 		cmd = 'virt-customize -q --hostname %s -a %s'%(args,hash)
-	os.system(cmd)
+	return(os.system(cmd))

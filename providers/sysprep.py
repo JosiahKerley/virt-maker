@@ -4,4 +4,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-sysprep -a %s'%(hash)
 	else:
 		cmd = 'virt-sysprep -q -a %s'%(hash)
-	os.system(cmd)
+	return(os.system(cmd))

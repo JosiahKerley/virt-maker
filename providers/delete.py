@@ -4,4 +4,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-customize --delete %s'%(args.replace(' ',','))
 	else:
 		cmd = 'virt-customize -q --delete %s'%(args.replace(' ',','))
-	os.system(cmd)
+	return(os.system(cmd))

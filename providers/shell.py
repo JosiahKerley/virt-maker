@@ -16,19 +16,18 @@ def provider(body,hash,args,verbose,image):
 		except: bin = '/bin/bash'
 		image.mount(hash)
 		cmd = "chroot ./ %s -c '%s %s ; exit'"%(bin,bin,filename)
-		os.system(cmd)
+		retval = os.system(cmd)
 		image.unmount(hash)
+		return(retval)
 	elif args[0] == 'boot':
 		if verbose:
 			cmd = 'virt-customize --firstboot "%s" -a %s'%(filename,hash)
 		else:
 			cmd = 'virt-customize -q --firstboot "%s" -a %s'%(filename,hash)
-		os.system(cmd)
+		return(os.system(cmd))
 	else:
 		if verbose:
 			cmd = 'virt-customize --run "%s" -a %s'%(filename,hash)
 		else:
 			cmd = 'virt-customize -q --run "%s" -a %s'%(filename,hash)
-		os.system(cmd)
-
-	
+		return(os.system(cmd))

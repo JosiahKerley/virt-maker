@@ -4,4 +4,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-customize --install %s'%(args.replace(' ',','))
 	else:
 		cmd = 'virt-customize -q --install %s'%(args.replace(' ',','))
-	os.system(cmd)
+	return(os.system(cmd))
