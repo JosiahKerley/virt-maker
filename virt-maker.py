@@ -191,9 +191,7 @@ for section in dsl2dict(filetext):
 			else:
 				#print '\nLoading "%s"'%(providerscript)
 				module = imp.load_source(section['provider'], providerscript)
-				#image.mount(section['hash'])
 				retval = module.provider(section['body'],lasthash,section['argument'],v,image)
-				image.unmount(section['hash'])
 				image.snapshot(section['hash'])
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
