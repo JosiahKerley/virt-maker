@@ -1,5 +1,34 @@
+## Fetch and create base image
 @image http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 @sysprep
 @update
 @hostname centos-7
 @export centos-7
+
+
+## Create machine "test-1"
+@image centos-7
+@hostname test-1
+@export test-1
+@create test-1
+connect=qemu:///system
+virt-type=kvm
+name=test-1
+ram=500
+size=8
+graphics=vnc
+os-variant=centos7
+
+
+## Create machine "test-2"
+@image centos-7
+@hostname test-2
+@export test-2
+@create test-2
+connect=qemu:///system
+virt-type=kvm
+name=test-2
+ram=500
+size=8
+graphics=vnc
+os-variant=centos7
