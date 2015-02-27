@@ -20,8 +20,8 @@ def provider(body,hash,args,verbose,image):
 		cmdargs += ' --%s %s'%(i,defaults[i])
 	cmdargs = cmdargs.replace('<[args]>',os.path.abspath(args))
 	if verbose:
-		cmd = 'virt-install --autostart %s'%(cmdargs)
+		cmd = 'virt-install --autostart %s --import'%(cmdargs)
 	else:
-		cmd = 'virt-install --autostart -q %s'%(cmdargs)
+		cmd = 'virt-install --autostart -q %s --import'%(cmdargs)
 	print cmd
 	return(os.system(cmd))

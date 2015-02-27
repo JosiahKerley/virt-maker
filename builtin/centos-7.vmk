@@ -25,8 +25,6 @@ os-variant=centos7
 @export test-2
 @create test-2
 connect=qemu:///system
-virt-type=kvm
 name=test-2
 ram=500
 graphics=vnc
-os-variant=centos7
