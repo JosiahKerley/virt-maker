@@ -20,6 +20,9 @@ dirs = [varlib,cachedir]
 for dir in dirs:
 	if not os.path.isdir(dir): os.makedirs(dir)
 
+## Prints verbose statements
+def verbose(text,label='INFO'):
+	print('\t%s: %s'%(label,text))
 
 ## Parses DSL
 def dsl2dict(text):
@@ -43,13 +46,24 @@ def dsl2dict(text):
 
 ## Download files from url
 def fetch(url,dest):
+	verbose("Fetching '%s'"%(url),'Download')
 	req = urllib2.urlopen(url)
 	CHUNK = 16 * 1024
-	with open(file, 'wb') as fp:
+	count = 0
+	total = int(req.headers["Content-Length"])
+	lastmsg = None
+	with open(dest, 'wb') as fp:
 		while True:
+			percent = int(float(count/total)*100)
 			chunk = req.read(CHUNK)
+			count += CHUNK
 			if not chunk: break
+			if not (count%(CHUNK*32)):
+				if not lastmsg == str(percent):
+					verbose('%s'%(str(percent)),'Download')
+					lastmsg = str(percent)
 			fp.write(chunk)
+	verbose('Done','Download')
 
 ## Handle the image
 class Image:
@@ -134,7 +148,7 @@ steps = 0
 for section in dsl2dict(filetext):
 	steps += 1
 	#print json.dumps(section,indent=2)
-	providerdir = '../providers'
+	providerdir = '%s/providers'%(varlib)
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 
@@ -148,6 +162,8 @@ for section in dsl2dict(filetext):
 			if not os.path.isfile(dest):
 				fetch(section['argument'],tmp)
 				os.rename(tmp,dest)
+			else:
+				verbose('Using cached','Download')
 			section['argument'] = dest
 		imagepath = os.path.abspath(section['argument']).replace('\\','/')
 		#print imagepath
@@ -174,7 +190,7 @@ for section in dsl2dict(filetext):
 				#print '\nLoading "%s"'%(providerscript)
 				module = imp.load_source(section['provider'], providerscript)
 				#image.mount(section['hash'])
-				retval = module.provider(section['body'],section['hash'],section['argument'],image)
+				retval = module.provider(image,section['body'],section['hash'],section['argument'])
 				image.unmount(section['hash'])
 				image.snapshot(section['hash'])
 	image.chainlink(section['hash'])

@@ -1,6 +1,6 @@
 import os
 import uuid
-def provider(body,hash,args=False,image):
+def provider(image,body,hash,args=False):
 
 	## Create the temp script
 	filename = '.virt-maker_shell-%s.sh'%str(uuid.uuid4())
