@@ -13,7 +13,7 @@ def provider(body,hash,args,verbose,image):
 	for line in body.split('\n'):
 		if '=' in line:
 			left = line.split('=')[0]
-			right = line.replace(left,'')
+			right = line.replace(left+'=','')
 			defaults[left] = right
 	cmdargs = ' '
 	for i in defaults:

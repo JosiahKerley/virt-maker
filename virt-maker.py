@@ -83,7 +83,7 @@ class Image:
 	def start(self):
 		#self.chain = [self.backingimage]
 		self.chain = []
-		self.buildchain = '%s/%s'%(os.getcwd(),self.buildchain)
+		self.buildchain = '%s/%s'%(os.getcwd(),('/%s'%(self.buildchain)).split('/')[-1])
 
 	def snapshot(self,link):
 		try:
@@ -165,11 +165,10 @@ for section in dsl2dict(filetext):
 			else:
 				verbose('Using cached','Download')
 			section['argument'] = dest
-		cachfile = '%s/%s'%(cachedir,section['argument'])
+		cachfile = '%s/%s'%(cachedir,('/%s'%(section['argument'])).split('/')[-1])
 		if os.path.isfile(cachfile):
 			section['argument'] = cachfile
 		imagepath = os.path.abspath(section['argument']).replace('\\','/')
-		#print imagepath
 		image.backingimage = imagepath.split('/')[-1]
 		sectiondir = '/'.join(imagepath.split('/')[:-1])
 		os.chdir(sectiondir)
@@ -194,7 +193,10 @@ for section in dsl2dict(filetext):
 				#print '\nLoading "%s"'%(providerscript)
 				module = imp.load_source(section['provider'], providerscript)
 				retval = module.provider(section['body'],lasthash,section['argument'],v,image)
-				if not retval: sys.exit(1)
+				if not retval == 0:
+					print retval
+					print('ERROR!')
+					sys.exit(1)
 				image.snapshot(section['hash'])
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
