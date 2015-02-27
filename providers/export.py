@@ -1,5 +1,5 @@
 import os
-def provider(image,body,hash,args=False):
+def provider(body,hash,args,verbose,image):
         retval = False
         if args == "": args = False
         if args and not args == 'export':

@@ -11,6 +11,7 @@ import cPickle as pickle
 
 
 ## Settings
+v = True
 varlib = '/var/lib/virt-maker'
 cachedir = '%s/cache'%(varlib)
 
@@ -145,6 +146,7 @@ chain = []
 cache = True
 ready = False
 steps = 0
+lasthash = None
 for section in dsl2dict(filetext):
 	steps += 1
 	#print json.dumps(section,indent=2)
@@ -169,6 +171,7 @@ for section in dsl2dict(filetext):
 		#print imagepath
 		image.backingimage = imagepath.split('/')[-1]
 		os.chdir('/'.join(imagepath.split('/')[:-1]))
+		os.system('ls')
 		image.setup()
 		chain = image.chain
 		chain.reverse()
@@ -190,10 +193,11 @@ for section in dsl2dict(filetext):
 				#print '\nLoading "%s"'%(providerscript)
 				module = imp.load_source(section['provider'], providerscript)
 				#image.mount(section['hash'])
-				retval = module.provider(image,section['body'],section['hash'],section['argument'])
+				retval = module.provider(section['body'],lasthash,section['argument'],v,image)
 				image.unmount(section['hash'])
 				image.snapshot(section['hash'])
 	image.chainlink(section['hash'])
+	lasthash = section['hash']
 
 
 ## Finish

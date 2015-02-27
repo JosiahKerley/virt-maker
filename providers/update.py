@@ -1,4 +1,7 @@
 import os
-def provider(image,body,hash,args=False):
-	cmd = 'virt-sysprep -q --update'
+def provider(body,hash,args,verbose,image):
+	if verbose:
+		cmd = 'virt-sysprep --update'
+	else:
+		cmd = 'virt-sysprep -q --update'
 	os.system(cmd)
