@@ -6,7 +6,7 @@ defaults = {
 	"network":"network=default",
 	"graphics":"vnc",
 	#"os-variant":"generic",
-	"wait":"3",
+	"wait":"0",
 }
 
 import os
