@@ -2,12 +2,12 @@
 @image http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 @sysprep
 @update
-@hostname centos-7
-@export centos-7
+@hostname centos-7-base
+@export centos-7-base
 
 
 ## Create machine "test-1"
-@image centos-7
+@image centos-7-base
 @hostname test-1
 @export test-1
 @create test-1
@@ -21,7 +21,7 @@ os-variant=centos7
 
 
 ## Create machine "test-2"
-@image centos-7
+@image centos-7-base
 @hostname test-2
 @export test-2
 @create test-2
