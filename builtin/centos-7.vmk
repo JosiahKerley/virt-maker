@@ -8,6 +8,8 @@
 systemctl disable cloud-init
 systemctl stop cloud-init
 yum remove -y cloud-init
+mv /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-ens3
+sed -i 's/eth0/ens3/g' /etc/sysconfig/network-scripts/ifcfg-ens3
 @export centos-7-base
 
 
