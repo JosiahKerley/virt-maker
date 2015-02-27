@@ -7,4 +7,4 @@ def provider(body,hash,args,verbose,image):
 					cmd = 'qemu-img convert -p -f qcow2 -O qcow2 %s "%s"'%(hash,args)
 				else:
 					cmd = 'qemu-img convert -f qcow2 -O qcow2 %s "%s"'%(hash,args)
-                return(os.system(cmd))
+				return(os.system(cmd))
