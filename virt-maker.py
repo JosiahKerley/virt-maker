@@ -5,9 +5,20 @@ import sys
 import imp
 import json
 import shutil
+import urllib2
 import hashlib
 import cPickle as pickle
 
+
+## Settings
+varlib = '/var/lib/virt-maker'
+cachedir = '%s/cache'%(varlib)
+
+
+## Prep dirs
+dirs = [varlib,cachedir]
+for dir in dirs:
+	if not os.path.isdir(dir): os.makedirs(dir)
 
 
 ## Parses DSL
@@ -30,7 +41,15 @@ def dsl2dict(text):
 	sections.remove(sections[0]) ## Remove blank entry
 	return(sections)
 
-
+## Download files from url
+def fetch(url,dest):
+	req = urllib2.urlopen(url)
+	CHUNK = 16 * 1024
+	with open(file, 'wb') as fp:
+		while True:
+			chunk = req.read(CHUNK)
+			if not chunk: break
+			fp.write(chunk)
 
 ## Handle the image
 class Image:
@@ -122,6 +141,14 @@ for section in dsl2dict(filetext):
 	## Handles the providers
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
 	if section['provider'] == "image":
+		if section['argument'].startswith("http://") or section['argument'].startswith("https://"):
+			filename = section['argument'].split('/')[-1]
+			dest = '%s/%s'%(cachedir,filename)
+			tmp = dest+'.downloading'
+			if not os.path.isfile(dest):
+				fetch(section['argument'],tmp)
+				os.rename(tmp,dest)
+			section['argument'] = dest
 		imagepath = os.path.abspath(section['argument']).replace('\\','/')
 		#print imagepath
 		image.backingimage = imagepath.split('/')[-1]
@@ -146,8 +173,8 @@ for section in dsl2dict(filetext):
 			else:
 				#print '\nLoading "%s"'%(providerscript)
 				module = imp.load_source(section['provider'], providerscript)
-				image.mount(section['hash'])
-				retval = module.provider(section['body'],section['hash'],section['argument'])
+				#image.mount(section['hash'])
+				retval = module.provider(section['body'],section['hash'],section['argument'],image)
 				image.unmount(section['hash'])
 				image.snapshot(section['hash'])
 	image.chainlink(section['hash'])
