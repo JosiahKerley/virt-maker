@@ -3,7 +3,7 @@
 @sysprep
 #@update
 #@hostname centos-7-base
-@rootpass Password1
+@password root:Password1
 @export centos-7-base
 
 
