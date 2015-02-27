@@ -1,5 +1,6 @@
 import os
 import uuid
+import shutil
 def provider(body,hash,args,verbose,image):
 
 	## Create the temp script
@@ -16,7 +17,7 @@ def provider(body,hash,args,verbose,image):
 		except: bin = '/bin/bash'
 		filename = os.path.abspath(filename)
 		image.mount(hash)
-		os.rename(filename,'./%s'%(filename.split('/')[-1]))
+		shutil.move(filename,'./%s'%(filename.split('/')[-1]))
 		cmd = "chroot ./ %s -c '%s %s ; exit'"%(bin,bin,filename)
 		retval = os.system(cmd)
 		image.unmount(hash)
