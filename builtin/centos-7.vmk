@@ -4,6 +4,9 @@
 #@update
 #@hostname centos-7-base
 @rootpass Password1
+@shell
+systemctl disable cloud-init
+systemctl stop cloud-init
 @export centos-7-base
 
 
