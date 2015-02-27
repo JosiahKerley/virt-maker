@@ -127,9 +127,6 @@ class Image:
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
 
 
-## For test
-#with open('test.vmk','r') as f: filetext = f.read()
-
 
 ## Get vmk contents
 try:
@@ -141,6 +138,7 @@ except:
 
 ## Main
 image = Image()
+image.buildchain = '.%s.%s'%(sys.argv[-1],image.buildchain)
 cwd = os.getcwd()
 chain = []
 cache = True
