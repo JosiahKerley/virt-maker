@@ -14,7 +14,7 @@ def provider(body,hash,args,verbose,image):
 	if args[0] == 'chroot':
 		try: bin = args[1]
 		except: bin = '/bin/bash'
-		filename = os.abspath(filename)
+		filename = os.path.abspath(filename)
 		image.mount(hash)
 		os.rename(filename,'./%s'%(filename.split('/')[-1]))
 		cmd = "chroot ./ %s -c '%s %s ; exit'"%(bin,bin,filename)
