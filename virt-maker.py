@@ -165,10 +165,14 @@ for section in dsl2dict(filetext):
 			else:
 				verbose('Using cached','Download')
 			section['argument'] = dest
+		cachfile = '%s/%s'%(cachedir,section['argument'])
+		if os.path.isfile(cachfile):
+			section['argument'] = cachfile
 		imagepath = os.path.abspath(section['argument']).replace('\\','/')
 		#print imagepath
 		image.backingimage = imagepath.split('/')[-1]
-		os.chdir('/'.join(imagepath.split('/')[:-1]))
+		sectiondir = '/'.join(imagepath.split('/')[:-1])
+		os.chdir(sectiondir)
 		image.setup()
 		chain = image.chain
 		chain.reverse()
