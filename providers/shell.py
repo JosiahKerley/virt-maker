@@ -20,15 +20,15 @@ def provider(body,hash,args,verbose,image):
 		image.unmount(hash)
 	elif args[0] == 'boot':
 		if verbose:
-			cmd = 'virt-customize --firstboot "%s" --operations script -a %s'%(filename,hash)
+			cmd = 'virt-customize --firstboot "%s" -a %s'%(filename,hash)
 		else:
-			cmd = 'virt-customize -q --firstboot "%s" --operations script -a %s'%(filename,hash)
+			cmd = 'virt-customize -q --firstboot "%s" -a %s'%(filename,hash)
 		os.system(cmd)
 	else:
 		if verbose:
-			cmd = 'virt-customize --run "%s" --operations firstboot -a %s'%(filename,hash)
+			cmd = 'virt-customize --run "%s" -a %s'%(filename,hash)
 		else:
-			cmd = 'virt-customize -q --run "%s" --operations firstboot -a %s'%(filename,hash)
+			cmd = 'virt-customize -q --run "%s" -a %s'%(filename,hash)
 		os.system(cmd)
 
 	
