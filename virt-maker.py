@@ -137,35 +137,37 @@ except:
 
 
 ## Main
+vmkdir = os.path.abspath(sys.argv[-1]).replace('\\','/')
 image = Image()
 image.buildchain = '.%s.%s'%(sys.argv[-1],image.buildchain)
 cwd = os.getcwd()
 chain = []
 cache = True
-ready = False
-ready = True
 steps = 0
 lasthash = None
+
+## Setup workspace
+workingdir = (vmkdir+'/.virt-maker')
+os.makedirs(workingdir)
+#image.backingimage = workingdir.split('/')[-1]
+os.chdir(workingdir)
+#image.setup()
+chain = image.chain
+chain.reverse()
+image.start()
+#image.snapshot(section['hash'])
+link = chain.pop()
+providerdir = '%s/providers'%(varlib)
+
+## Execute sections
 for section in dsl2dict(filetext):
 	steps += 1
 	#print json.dumps(section,indent=2)
-	providerdir = '%s/providers'%(varlib)
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 
 	## Handles the providers
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
-	imagepath = os.path.abspath(section['argument']).replace('\\','/')
-	image.backingimage = imagepath.split('/')[-1]
-	sectiondir = '/'.join(imagepath.split('/')[:-1])
-	os.chdir(sectiondir)
-	image.setup()
-	chain = image.chain
-	chain.reverse()
-	image.start()
-	ready = True
-	image.snapshot(section['hash'])
-	link = chain.pop()
 	try: link = chain.pop()
 	except: link = None
 	if link == section['hash'] and cache and os.path.isfile(section['hash']):
@@ -183,7 +185,8 @@ for section in dsl2dict(filetext):
 				print retval
 				print('ERROR!')
 				sys.exit(1)
-			image.snapshot(section['hash'])
+			try: image.snapshot(section['hash'])
+			except: pass
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
 
