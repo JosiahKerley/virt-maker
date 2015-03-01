@@ -143,6 +143,7 @@ cwd = os.getcwd()
 chain = []
 cache = True
 ready = False
+ready = True
 steps = 0
 lasthash = None
 for section in dsl2dict(filetext):

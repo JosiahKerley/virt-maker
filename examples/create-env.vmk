@@ -1,4 +1,6 @@
 
+
+
 ## Create base images
 @virt-builder centos-7.0
 @qemu-img convert -f raw -O qcow2 centos-7.0.img centos7
