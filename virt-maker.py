@@ -155,50 +155,35 @@ for section in dsl2dict(filetext):
 
 	## Handles the providers
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
-	if section['provider'] == "image":
-		if section['argument'].startswith("http://") or section['argument'].startswith("https://"):
-			filename = section['argument'].split('/')[-1]
-			dest = '%s/%s'%(cachedir,filename)
-			tmp = dest+'.downloading'
-			if not os.path.isfile(dest):
-				fetch(section['argument'],tmp)
-				os.rename(tmp,dest)
-			else:
-				verbose('Using cached','Download')
-			section['argument'] = dest
-		cachfile = '%s/%s'%(cachedir,('/%s'%(section['argument'])).split('/')[-1])
-		if os.path.isfile(cachfile):
-			section['argument'] = cachfile
-		imagepath = os.path.abspath(section['argument']).replace('\\','/')
-		image.backingimage = imagepath.split('/')[-1]
-		sectiondir = '/'.join(imagepath.split('/')[:-1])
-		os.chdir(sectiondir)
-		image.setup()
-		chain = image.chain
-		chain.reverse()
-		image.start()
-		ready = True
-		image.snapshot(section['hash'])
-		link = chain.pop()
-	elif ready:
-		try: link = chain.pop()
-		except: link = None
-		if link == section['hash'] and cache and os.path.isfile(section['hash']):
-			#print('Using cached %s'%(section['hash']))
-			pass
+	imagepath = os.path.abspath(section['argument']).replace('\\','/')
+	image.backingimage = imagepath.split('/')[-1]
+	sectiondir = '/'.join(imagepath.split('/')[:-1])
+	os.chdir(sectiondir)
+	image.setup()
+	chain = image.chain
+	chain.reverse()
+	image.start()
+	ready = True
+	image.snapshot(section['hash'])
+	link = chain.pop()
+	try: link = chain.pop()
+	except: link = None
+	if link == section['hash'] and cache and os.path.isfile(section['hash']):
+		#print('Using cached %s'%(section['hash']))
+		pass
+	else:
+		cache = False
+		if not os.path.isfile(providerscript):
+			print '\nCannot find "%s"'%(providerscript)
 		else:
-			cache = False
-			if not os.path.isfile(providerscript):
-				print '\nCannot find "%s"'%(providerscript)
-			else:
-				#print '\nLoading "%s"'%(providerscript)
-				module = imp.load_source(section['provider'], providerscript)
-				retval = module.provider(section['body'],lasthash,section['argument'],v,image)
-				if not retval == 0:
-					print retval
-					print('ERROR!')
-					sys.exit(1)
-				image.snapshot(section['hash'])
+			#print '\nLoading "%s"'%(providerscript)
+			module = imp.load_source(section['provider'], providerscript)
+			retval = module.provider(section['body'],lasthash,section['argument'],v,image)
+			if not retval == 0:
+				print retval
+				print('ERROR!')
+				sys.exit(1)
+			image.snapshot(section['hash'])
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
 
