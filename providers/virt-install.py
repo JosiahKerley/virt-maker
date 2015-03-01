@@ -5,5 +5,5 @@ def provider(body,hash,args,verbose,image):
 		cmd = '%s %s'%(cmd,args)
 		print(cmd)
 	else:
-		cmd = '%s --quite %s'%(cmd,args)
+		cmd = '%s --quite %s >/dev/null'%(cmd,args)
 	return(os.system(cmd))

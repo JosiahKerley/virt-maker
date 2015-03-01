@@ -93,8 +93,8 @@ class Image:
 		## snapshot command here
 		with open(link,'w') as f: f.write('')
 		cmd = 'qemu-img create -f qcow2 -b %s %s'%(imagefile,link)
-		#print cmd
-		os.system(cmd)
+		print cmd
+		if not os.system(cmd) == 0: os.remove(link)
 
 	def chainlink(self,link):
 		self.chain.append(link)
@@ -137,7 +137,9 @@ except:
 
 
 ## Main
-vmkdir = os.path.abspath(sys.argv[-1]).replace('\\','/')
+'/'.join(sys.argv[-1].split('/')[:-1])
+vmkdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
+print vmkdir
 image = Image()
 image.buildchain = '.%s.%s'%(sys.argv[-1],image.buildchain)
 cwd = os.getcwd()
