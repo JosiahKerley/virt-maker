@@ -26,11 +26,11 @@ def provider(body,hash,args,verbose,image):
 		if verbose:
 			cmd = 'virt-customize --firstboot "%s" -a %s'%(filename,hash)
 		else:
-			cmd = 'virt-customize -q --firstboot "%s" -a %s'%(filename,hash)
+			cmd = 'virt-customize -q --firstboot "%s" -a %s >/dev/null 2>&1'%(filename,hash)
 		return(os.system(cmd))
 	else:
 		if verbose:
 			cmd = 'virt-customize --run "%s" -a %s'%(filename,hash)
 		else:
-			cmd = 'virt-customize -q --run "%s" -a %s'%(filename,hash)
+			cmd = 'virt-customize -q --run "%s" -a %s >/dev/null 2>&1'%(filename,hash)
 		return(os.system(cmd))

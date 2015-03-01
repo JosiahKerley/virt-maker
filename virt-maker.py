@@ -70,7 +70,7 @@ def fetch(url,dest):
 class Image:
 	backingimage = False
 	lastimg = False
-	chain = [None]
+	chain = ['rootbase']
 	buildchain = 'buildchain'
 
 	def setup(self):
