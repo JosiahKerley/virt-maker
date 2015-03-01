@@ -1,5 +1,0 @@
-@image http://cloud.centos.org/centos/6/images/CentOS-6-x86_64-GenericCloud.qcow2
-@sysprep
-@update
-@hostname centos-6
-@export centos-6

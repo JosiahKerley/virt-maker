@@ -5,13 +5,15 @@
 @virt-builder centos-7.0
 @qemu-img convert -f raw -O qcow2 centos-7.0.img centos7
 @virt-customize -a centos7 --root-password password:Password1
-@virt-customize -a centos7 --update --install openssh
+@virt-customize -a centos7 --run-command 'yum clean all'
+@virt-customize -a centos7 --install openssh
 @import centos7
 @export centos7-base
-@virt-builder centos-6.0
-@qemu-img convert -f raw -O qcow2 centos-6.6.img centos6
+@virt-builder centos-6
+@qemu-img convert -f raw -O qcow2 centos-6.img centos6
 @virt-customize -a centos6 --root-password password:Password1
-@virt-customize -a centos6 --update --install openssh
+@virt-customize -a centos6 --run-command 'yum clean all'
+@virt-customize -a centos6 --install openssh
 @import centos6
 @export centos6-base
 

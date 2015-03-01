@@ -13,11 +13,10 @@ import cPickle as pickle
 ## Settings
 v = True
 varlib = '/var/lib/virt-maker'
-cachedir = '%s/cache'%(varlib)
 
 
 ## Prep dirs
-dirs = [varlib,cachedir]
+dirs = [varlib]
 for dir in dirs:
 	if not os.path.isdir(dir): os.makedirs(dir)
 
@@ -117,11 +116,8 @@ class Image:
 		## unmount command
 		cmd = 'guestunmount %s/'%(mountdir)
 		cmd = 'umount %s/'%(mountdir)
-		#print cmd
 		os.system(cmd)
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
-
-
 
 ## Get vmk contents
 try:
@@ -154,14 +150,12 @@ providerdir = '%s/providers'%(varlib)
 ## Execute sections
 for section in dsl2dict(filetext):
 	steps += 1
-	#print json.dumps(section,indent=2)
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 	## Handles the providers
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
 	try: link = chain.pop()
 	except: link = None
-	#if link == section['hash'] and cache and os.path.isfile(section['hash']):
 	if link == section['hash'] and cache:
 		pass
 	else:
@@ -178,24 +172,9 @@ for section in dsl2dict(filetext):
 				print('ERROR!')
 				sys.exit(1)
 			try: image.snapshot(section['hash'])
-			except: pass
+			except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
 
 ## Finish
 os.chdir(cwd)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
