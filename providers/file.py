@@ -13,7 +13,9 @@ def provider(body,hash,args,verbose,image):
 		args = args.split(' ')
 	dest = args[0]
 	if verbose:
-		cmd = 'virt-customize    --copy-in "%s:%s" -a %s'%(filename,dest,hash)
+		#cmd = 'virt-customize    --copy-in "%s:%s" -a %s'%(filename,dest,hash)
+		cmd = 'virt-customize    --upload "%s:%s" -a %s'%(filename,dest,hash)
 	else:
-		cmd = 'virt-customize -q --copy-in "%s:%s" -a %s'%(filename,dest,hash)
+		#cmd = 'virt-customize -q --copy-in "%s:%s" -a %s'%(filename,dest,hash)
+		cmd = 'virt-customize -q --upload "%s:%s" -a %s'%(filename,dest,hash)
 	return(os.system(cmd))	
