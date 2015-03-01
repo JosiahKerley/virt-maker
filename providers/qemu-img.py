@@ -1,6 +1,6 @@
 import os
-cmd = 'qemu-img '
 def provider(body,hash,args,verbose,image):
+	cmd = 'qemu-img'
 	if verbose:
 		cmd = '%s %s'%(cmd,args)
 	else:

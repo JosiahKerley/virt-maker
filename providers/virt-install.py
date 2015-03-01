@@ -1,6 +1,6 @@
 import os
-cmd = 'virt-install '
 def provider(body,hash,args,verbose,image):
+	cmd = 'virt-install'
 	if verbose:
 		cmd = '%s %s'%(cmd,args)
 	else:
