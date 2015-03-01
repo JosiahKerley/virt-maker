@@ -79,11 +79,6 @@ class Image:
 				with open(self.buildchain,'r') as f: self.chain = pickle.loads(f.read())
 			except:
 				os.remove(self.buildchain)
-	
-	def start(self):
-		#self.chain = [self.backingimage]
-		self.chain = []
-		self.buildchain = '%s/%s'%(os.getcwd(),('/%s'%(self.buildchain)).split('/')[-1])
 
 	def snapshot(self,link):
 		try:
@@ -135,13 +130,11 @@ except:
 	print('Cannot open *.vmk file')
 	sys.exit(False)
 
-
 ## Main
 '/'.join(sys.argv[-1].split('/')[:-1])
 vmkdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
-print vmkdir
+workingdir = (vmkdir+'/.virt-maker')
 image = Image()
-image.buildchain = '.%s.%s'%(sys.argv[-1],image.buildchain)
 cwd = os.getcwd()
 chain = []
 cache = True
@@ -149,15 +142,12 @@ steps = 0
 lasthash = None
 
 ## Setup workspace
-workingdir = (vmkdir+'/.virt-maker')
-os.makedirs(workingdir)
-#image.backingimage = workingdir.split('/')[-1]
+if not os.path.isdir(workingdir):
+	os.makedirs(workingdir)
 os.chdir(workingdir)
-#image.setup()
-chain = image.chain
+image.setup()
+chain = json.loads(json.dumps(image.chain))
 chain.reverse()
-image.start()
-#image.snapshot(section['hash'])
 link = chain.pop()
 providerdir = '%s/providers'%(varlib)
 
@@ -167,20 +157,20 @@ for section in dsl2dict(filetext):
 	#print json.dumps(section,indent=2)
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
-
 	## Handles the providers
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
 	try: link = chain.pop()
 	except: link = None
-	if link == section['hash'] and cache and os.path.isfile(section['hash']):
-		#print('Using cached %s'%(section['hash']))
+	#if link == section['hash'] and cache and os.path.isfile(section['hash']):
+	if link == section['hash'] and cache:
 		pass
 	else:
 		cache = False
 		if not os.path.isfile(providerscript):
-			print '\nCannot find "%s"'%(providerscript)
+			print 'Cannot find provider script "%s"'%(providerscript)
+			exit(1)
+			pass
 		else:
-			#print '\nLoading "%s"'%(providerscript)
 			module = imp.load_source(section['provider'], providerscript)
 			retval = module.provider(section['body'],lasthash,section['argument'],v,image)
 			if not retval == 0:
@@ -191,7 +181,6 @@ for section in dsl2dict(filetext):
 			except: pass
 	image.chainlink(section['hash'])
 	lasthash = section['hash']
-
 
 ## Finish
 os.chdir(cwd)
