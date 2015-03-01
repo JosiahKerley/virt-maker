@@ -6,4 +6,7 @@ def provider(body,hash,args,verbose,image):
 		print(cmd)
 	else:
 		cmd = '%s %s >/dev/null'%(cmd,args)
-	return(os.system(cmd))
+	#return(os.system(cmd))
+	os.system(cmd)
+	return(0)
+	
