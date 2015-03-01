@@ -70,7 +70,7 @@ def fetch(url,dest):
 class Image:
 	backingimage = False
 	lastimg = False
-	chain = ['rootbase']
+	chain = [None]
 	buildchain = 'buildchain'
 
 	def setup(self):
@@ -87,8 +87,7 @@ class Image:
 			imagefile = self.backingimage
 		## snapshot command here
 		with open(link,'w') as f: f.write('')
-		cmd = 'qemu-img create -f qcow2 -b %s %s'%(imagefile,link)
-		print cmd
+		cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1'%(imagefile,link)
 		if not os.system(cmd) == 0: os.remove(link)
 
 	def chainlink(self,link):
@@ -102,8 +101,7 @@ class Image:
 			imagefile = self.backingimage
 		mountdir = '%s_mount'%(imagefile)
 		if not os.path.isdir(mountdir): os.makedirs(mountdir)
-		cmd = 'guestmount -a %s -m /dev/sda1 --rw %s/'%(imagefile,mountdir)
-		print cmd
+		cmd = 'guestmount -a %s -m /dev/sda1 --rw %s/ >/dev/null 2>&1'%(imagefile,mountdir)
 		os.system(cmd)
 		os.chdir(mountdir)
 
@@ -157,6 +155,7 @@ for section in dsl2dict(filetext):
 	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
 	try: link = chain.pop()
 	except: link = None
+	#except: link = None
 	if link == section['hash'] and cache:
 		pass
 	else:
