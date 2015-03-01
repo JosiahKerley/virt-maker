@@ -1,0 +1,28 @@
+## Create centos base images
+@virt-builder ubuntu-10.04
+@qemu-img convert -f raw -O qcow2 ubuntu-10.04.img ubuntu-10.04-base
+@virt-sysprep -a ubuntu-10.04-base
+@virt-customize -a ubuntu-10.04-base --root-password password:Password1
+@virt-customize -a ubuntu-10.04-base --run-command 'yum clean all'
+@virt-customize -a ubuntu-10.04-base --install openssh
+@import ubuntu-10.04-base
+@export /var/lib/virt-maker/cache/ubuntu-10.04-base
+
+@virt-builder ubuntu-12.04
+@qemu-img convert -f raw -O qcow2 ubuntu-12.04.img ubuntu-12.04-base
+@virt-sysprep -a ubuntu-12.04-base
+@virt-customize -a ubuntu-12.04-base --root-password password:Password1
+@virt-customize -a ubuntu-12.04-base --run-command 'yum clean all'
+@virt-customize -a ubuntu-12.04-base --install openssh
+@import ubuntu-12.04-base
+@export /var/lib/virt-maker/cache/ubuntu-12.04-base
+
+@virt-builder ubuntu-14.04
+@qemu-img convert -f raw -O qcow2 ubuntu-14.04.img ubuntu-14.04-base
+@virt-sysprep -a ubuntu-14.04-base
+@virt-customize -a ubuntu-14.04-base --root-password password:Password1
+@virt-customize -a ubuntu-14.04-base --run-command 'yum clean all'
+@virt-customize -a ubuntu-14.04-base --install openssh
+@import ubuntu-14.04-base
+@export /var/lib/virt-maker/cache/ubuntu-14.04-base
+

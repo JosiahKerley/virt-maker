@@ -13,10 +13,11 @@ import cPickle as pickle
 ## Settings
 v = True
 varlib = '/var/lib/virt-maker'
+imgcache = '%s/cache'%(varlib)
 
 
 ## Prep dirs
-dirs = [varlib]
+dirs = [varlib,imgcache]
 for dir in dirs:
 	if not os.path.isdir(dir): os.makedirs(dir)
 
