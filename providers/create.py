@@ -24,5 +24,4 @@ def provider(body,hash,args,verbose,image):
 		cmd = 'virt-install --autostart %s --import --force'%(cmdargs)
 	else:
 		cmd = 'virt-install --autostart -q %s --import --force >/dev/null 2>&1'%(cmdargs)
-	print cmd
 	return(os.system(cmd))

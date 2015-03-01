@@ -11,7 +11,7 @@ import cPickle as pickle
 
 
 ## Settings
-v = True
+v = False
 varlib = '/var/lib/virt-maker'
 imgcache = '%s/cache'%(varlib)
 
@@ -152,7 +152,8 @@ for section in dsl2dict(filetext):
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 	## Handles the providers
-	print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
+	#print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
+	print('[STEP] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
 	try: link = chain.pop()
 	except: link = None
 	#except: link = None
