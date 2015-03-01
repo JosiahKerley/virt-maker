@@ -1,0 +1,182 @@
+
+## Create base images
+@virt-builder centos-7.0
+@qemu-img convert -f raw -O qcow2 centos-7.0.img centos7
+@virt-customize -a centos7 --root-password password:Password1
+@virt-customize -a centos7 --update --install openssh
+@export centos7-base
+@virt-builder centos-6.0
+@qemu-img convert -f raw -O qcow2 centos-6.6.img centos6
+@virt-customize -a centos6 --root-password password:Password1
+@virt-customize -a centos6 --update --install openssh
+@export centos6-base
+
+
+## Install Jenkins
+@import centos7-base
+@script
+yum clean all
+yum install -y http://pkg.jenkins-ci.org/redhat/jenkins-1.600-1.1.noarch.rpm
+@export /var/lib/libvirt/images/jenkins
+@virsh destroy jenkins
+@virsh undefine jenkins
+@virt-install --import --autostart --name jenkins --ram 2048 --disk path=/var/lib/libvirt/images/jenkins,format=qcow2 --wait 0
+
+
+## Install Owncloud
+@import centos7-base
+@run yum -y update; yum clean all
+@run yum -y install epel-release; yum clean all
+@run yum install -y owncloud{,-httpd,-sqlite}; yum clean all
+@run yum install -y mod_ssl; yum clean all
+@run sed -i 's/"forcessl" => false,/"forcessl" => true,/' /etc/owncloud/config.php
+@run sed -i 's/Require local/Require all granted/' /etc/httpd/conf.d/owncloud.conf
+@run sed -i "s/'trusted_domains'/#'trusted_domains'/" /etc/owncloud/config.php
+@run systemctl enable httpd
+@export /var/lib/libvirt/images/owncloud
+@virsh destroy owncloud
+@virsh undefine owncloud
+@virt-install --import --autostart --name owncloud --ram 2048 --disk path=/var/lib/libvirt/images/owncloud,format=qcow2 --wait 0
+
+
+
+## Install Sensu
+@import centos6-base
+
+@file /etc/supervisord.conf
+[supervisord]
+nodaemon=true
+[program:sshd]
+command=/usr/sbin/sshd -D
+[program:redis]
+command=/etc/init.d/redis start
+[program:rabbitmq-server]
+command=/etc/init.d/rabbitmq-server start
+[program:sensu-server]
+command=/etc/init.d/sensu-server start
+[program:uchiwa]
+command=/etc/init.d/uchiwa start
+[program:sensu-api]
+command=/etc/init.d/sensu-api start
+
+@file /etc/sensu/uchiwa.json
+{
+  "sensu": [
+    {
+      "name": "Sensu",
+      "host": "127.0.0.1",
+      "ssl": false,
+      "port": 4567,
+      "user": "",
+      "pass": "",
+      "path": "",
+      "timeout": 5000
+    }
+  ],
+  "uchiwa": {
+    "user": "",
+    "pass": "",
+    "port": 3000,
+    "stats": 10,
+    "refresh": 10000
+  }
+}
+
+@file /etc/sensu/config.json
+{
+  "rabbitmq": {
+    "host": "localhost",
+    "port": 5671,
+    "vhost": "/sensu",
+    "user": "sensu",
+    "password": "password",
+    "ssl": {
+      "cert_chain_file": "/etc/sensu/ssl/cert.pem",
+      "private_key_file": "/etc/sensu/ssl/key.pem"
+    }
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379
+  },
+  "api": {
+    "host": "localhost",
+    "bind": "0.0.0.0",
+    "port": 4567
+  }
+}
+
+@file /etc/yum.repos.d/sensu.repo
+[sensu]
+name=sensu-main
+baseurl=http://repos.sensuapp.org/yum/el/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+
+@file /etc/rabbitmq/rabbitmq.config
+[
+  {kernel, [
+
+  ]},
+  {rabbit, [
+    {ssl_listeners, [5671]},
+    {ssl_options, [{cacertfile,"/etc/rabbitmq/ssl/cacert.pem"},
+                    {certfile,"/etc/rabbitmq/ssl/cert.pem"},
+                    {keyfile,"/etc/rabbitmq/ssl/key.pem"},
+                    {verify,verify_none},
+                    {fail_if_no_peer_cert,false}]},
+    {tcp_listen_options, [binary, {packet,raw},
+                                  {reuseaddr,true},
+                                  {backlog,128},
+                                  {nodelay,true},
+                                  {exit_on_close,false},
+                                  {keepalive,false}]},
+    {default_user, <<"sensu">>},
+    {default_pass, <<"password">>},
+    {default_vhost, <<"/sensu">>},
+    {default_permissions, [<<".*">>, <<".*">>, <<".*">>]}
+  ]}
+].
+
+
+@run yum clean all
+@run yum install -y epel-release
+@run yum install -y passwd
+@run yum install -y sudo
+@run yum install -y git
+@run yum install -y wget
+@run yum install -y openssl
+@run yum install -y openssh
+@run yum install -y openssh-server
+@run yum install -y openssh-clients
+@run useradd hiroakis
+@run echo "hiroakis" | passwd hiroakis --stdin
+@run sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+@run sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
+@run echo "hiroakis ALL=(ALL) ALL" >> /etc/sudoers.d/hiroakis
+@run yum install -y redis
+@run yum install -y erlang
+@run rpm --import http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+@run rpm -Uvh http://www.rabbitmq.com/releases/rabbitmq-server/v3.1.4/rabbitmq-server-3.1.4-1.noarch.rpm
+@run git clone git://github.com/joemiller/joemiller.me-intro-to-sensu.git
+@run cd joemiller.me-intro-to-sensu/; ./ssl_certs.sh clean && ./ssl_certs.sh generate
+@run mkdir /etc/rabbitmq/ssl
+@run cp /joemiller.me-intro-to-sensu/server_cert.pem /etc/rabbitmq/ssl/cert.pem
+@run cp /joemiller.me-intro-to-sensu/server_key.pem /etc/rabbitmq/ssl/key.pem
+@run cp /joemiller.me-intro-to-sensu/testca/cacert.pem /etc/rabbitmq/ssl/
+@run rabbitmq-plugins enable rabbitmq_management
+@run yum install -y sensu
+@run mkdir -p /etc/sensu/ssl
+@run cp /joemiller.me-intro-to-sensu/client_cert.pem /etc/sensu/ssl/cert.pem
+@run cp /joemiller.me-intro-to-sensu/client_key.pem /etc/sensu/ssl/key.pem
+@run yum install -y uchiwa
+@run wget http://peak.telecommunity.com/dist/ez_setup.py;python ez_setup.py
+@run easy_install supervisor
+@run chkconfig sshd on
+@export /var/lib/libvirt/images/sensu
+@virsh destroy sensu
+@virsh undefine sensu
+@virt-install --import --autostart --name sensu --ram 2048 --disk path=/var/lib/libvirt/images/sensu,format=qcow2 --wait 0
+
+
+

@@ -19,6 +19,7 @@ sed -i 's/eth0/ens3/g' /etc/sysconfig/network-scripts/ifcfg-ens3
 @export centos-7-base
 
 
+
 ## Create machine "test-1"
 @image centos-7-base
 
@@ -31,6 +32,7 @@ connect=qemu:///system
 name=test-1
 ram=500
 graphics=vnc
+
 
 
 ## Create machine "test-2"
