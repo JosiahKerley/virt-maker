@@ -3,7 +3,7 @@ import uuid
 def provider(body,hash,args,verbose,image):
 
 	## Create the temp script
-	filename = '.virt-maker_file-%s.sh'%str(uuid.uuid4())
+	filename = '.virt-maker_file-%s.tmp'%str(uuid.uuid4())
 	with open(filename,'w') as f: f.write(body)
 
 	## Parse args
@@ -12,10 +12,10 @@ def provider(body,hash,args,verbose,image):
 	else:
 		args = args.split(' ')
 	dest = args[0]
+	dir = os.path.dirname(dest)
 	if verbose:
-		#cmd = 'virt-customize    --copy-in "%s:%s" -a %s'%(filename,dest,hash)
-		cmd = 'virt-customize    --upload "%s:%s" -a %s >/dev/null 2>&1'%(filename,dest,hash)
+		cmd = 'virt-customize --mkdir "%s" --upload "%s":"%s" -a %s'%(dir,filename,dest,hash)
+		print cmd
 	else:
-		#cmd = 'virt-customize -q --copy-in "%s:%s" -a %s'%(filename,dest,hash)
-		cmd = 'virt-customize -q --upload "%s:%s" -a %s >/dev/null 2>&1'%(filename,dest,hash)
+		cmd = 'virt-customize -q --mkdir "%s" --upload "%s":"%s" -a %s >/dev/null 2>&1'%(dir,filename,dest,hash)
 	return(os.system(cmd))	
