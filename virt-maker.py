@@ -180,7 +180,7 @@ for section in dsl2dict(filetext):
 				exit(1)
 		else:
 			module = imp.load_source(section['provider'], providerscript)
-			retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings['verbose'])
+			retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 			if not retval == 0:
 				print retval
 				print('ERROR!')
