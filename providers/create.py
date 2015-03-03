@@ -10,7 +10,7 @@ defaults = {
 }
 
 import os
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 	for line in body.split('\n'):
 		if '=' in line:
 			left = line.split('=')[0]

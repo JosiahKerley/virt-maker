@@ -1,5 +1,5 @@
 import os
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 	cmd = 'virt-sysprep'
 	if verbose:
 		cmd = '%s %s'%(cmd,args)

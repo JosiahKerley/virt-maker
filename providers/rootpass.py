@@ -1,5 +1,5 @@
 import os
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 	if verbose:
 		cmd = 'virt-customize --root-password password:%s -a %s'%(args,hash)
 	else:

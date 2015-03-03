@@ -1,5 +1,5 @@
 import os
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 	virtmakercache = '/var/lib/virt-maker/cache'
 	if os.path.isfile(args):
 		pass

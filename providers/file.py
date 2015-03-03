@@ -1,6 +1,6 @@
 import os
 import uuid
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 
 	## Create the temp script
 	filename = '.virt-maker_file-%s.tmp'%str(uuid.uuid4())
@@ -18,4 +18,4 @@ def provider(body,hash,args,verbose,image):
 		print cmd
 	else:
 		cmd = 'virt-customize -q --mkdir "%s" --upload "%s":"%s" -a %s >/dev/null 2>&1'%(dir,filename,dest,hash)
-	return(os.system(cmd))	
+	return(os.system(cmd))

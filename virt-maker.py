@@ -8,16 +8,19 @@ import shutil
 import urllib2
 import hashlib
 import cPickle as pickle
+from distutils.spawn import find_executable
 
 
 ## Settings
-v = False
-varlib = '/var/lib/virt-maker'
-imgcache = '%s/cache'%(varlib)
+settings = {
+	'verbose':True,
+	'varlib':'/var/lib/virt-maker',
+	'imgcache':'%s/cache'%(varlib)
+}
 
 
 ## Prep dirs
-dirs = [varlib,imgcache]
+dirs = [settings['varlib'],settings['imgcache']]
 for dir in dirs:
 	if not os.path.isdir(dir): os.makedirs(dir)
 
@@ -144,7 +147,7 @@ image.setup()
 chain = json.loads(json.dumps(image.chain))
 chain.reverse()
 link = chain.pop()
-providerdir = '%s/providers'%(varlib)
+providerdir = '%s/providers'%(settings['varlib'])
 
 ## Execute sections
 for section in dsl2dict(filetext):
@@ -152,22 +155,31 @@ for section in dsl2dict(filetext):
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 	## Handles the providers
-	#print '[STEP] %s/%s %s - %s'%(steps,len(dsl2dict(filetext)),section['provider'],section['hash'])
 	print('[STEP] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
 	try: link = chain.pop()
 	except: link = None
-	#except: link = None
 	if link == section['hash'] and cache:
 		pass
 	else:
 		cache = False
 		if not os.path.isfile(providerscript):
-			print 'Cannot find provider script "%s"'%(providerscript)
-			exit(1)
-			pass
+			if not find_executable(section['provider']) == None:	## Handles arbitrary commands
+				if settings['verbose']:
+					cmd = '%s %s'%(section['provider'],section['argument'])
+					print(cmd)
+				else:
+					cmd = '%s %s >/dev/null 2>&1'%(section['provider'],section['argument'])
+				retval = os.system(cmd)
+				if not retval == 0:
+					print retval
+					print('ERROR!')
+					sys.exit(1)
+			else:
+				print 'Cannot find provider script "%s"'%(providerscript)
+				exit(1)
 		else:
 			module = imp.load_source(section['provider'], providerscript)
-			retval = module.provider(section['body'],lasthash,section['argument'],v,image)
+			retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings['verbose'])
 			if not retval == 0:
 				print retval
 				print('ERROR!')

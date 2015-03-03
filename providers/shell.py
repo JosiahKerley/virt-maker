@@ -1,7 +1,7 @@
 import os
 import uuid
 import shutil
-def provider(body,hash,args,verbose,image):
+def provider(body,hash,args,verbose,image,settings):
 
 	## Create the temp script
 	filename = '.virt-maker_shell-%s.sh'%str(uuid.uuid4())

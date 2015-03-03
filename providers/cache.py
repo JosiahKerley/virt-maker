@@ -1,5 +1,6 @@
 import os
 def provider(body,hash,args,verbose,image,settings):
+	args = ('%s/%s'%(settings['imgcache'],args.split('/')[-1])).replace('//','/')
 	retval = False
 	if args == "": args = False
 	if args and not args == 'export':
