@@ -15,7 +15,7 @@ from distutils.spawn import find_executable
 settings = {
 	'verbose':True,
 	'varlib':'/var/lib/virt-maker',
-	'imgcache':'%s/cache'%(varlib)
+	'imgcache':'/var/lib/virt-maker/cache'
 }
 
 
