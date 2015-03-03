@@ -32,6 +32,7 @@ def verbose(text,label='INFO'):
 def dsl2dict(text):
 	providerchar = '@'
 	text = '\n'+text
+	text = text.replace('\n@','\n\n@')
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
 	for s in sectionsraw:
