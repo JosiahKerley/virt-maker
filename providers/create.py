@@ -8,13 +8,12 @@ defaults = {
 	#"os-variant":"generic",
 	"wait":"0",
 }
-
 import os
 def provider(body,hash,args,verbose,image,settings):
 	for line in body.split('\n'):
 		if '=' in line:
 			left = line.split('=')[0]
-			right = line.replace(left+'=','')
+			right = '='.join(line.split('=')[1:])
 			defaults[left] = right
 	cmdargs = ' '
 	for i in defaults:
@@ -22,6 +21,8 @@ def provider(body,hash,args,verbose,image,settings):
 	cmdargs = cmdargs.replace('<[args]>',os.path.abspath(args))
 	if verbose:
 		cmd = 'virt-install --autostart %s --import --force'%(cmdargs)
+		print cmd
 	else:
 		cmd = 'virt-install --autostart -q %s --import --force >/dev/null 2>&1'%(cmdargs)
 	return(os.system(cmd))
+
