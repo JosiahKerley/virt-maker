@@ -38,7 +38,7 @@ def dsl2dict(text):
 	for i in headertext.split('\n'):
 		if '=' in i:
 			key = mutatestr%(i.split('=')[0])
-			val = i.split('=')[0]
+			val = i.split('=')[1]
 			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
