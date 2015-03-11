@@ -163,7 +163,7 @@ for section in dsl2dict(filetext):
 	providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
 	## Handles the providers
-	print('[STEP] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
+	print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
 	try: link = chain.pop()
 	except: link = None
 	if link == section['hash'] and cache:
