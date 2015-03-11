@@ -31,8 +31,16 @@ def verbose(text,label='INFO'):
 ## Parses DSL
 def dsl2dict(text):
 	providerchar = '@'
+	mutatestr = '<[%s]>'
 	text = '\n'+text
-	text = text.replace('\n@','\n\n@')
+	text = text.replace('\n%s'%(providerchar),'\n\n%s'%(providerchar))
+	headertext = text.split('%s'%(providerchar))[0]
+	variables = []
+	for i in headertext.split('\n'):
+		if '=' in i:
+			key = providerchar%(i.split('=')[0])
+			val = i.split('=')[0]
+			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
 	for s in sectionsraw:
