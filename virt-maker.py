@@ -145,7 +145,7 @@ class Image:
 
 
 ## Build VMK file
-def build(template):
+def build(template,noop=False):
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
@@ -198,7 +198,7 @@ def build(template):
 					exit(1)
 			else:
 				module = imp.load_source(section['provider'], providerscript)
-				retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
+				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
 					print('ERROR!')
@@ -218,7 +218,8 @@ def build(template):
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
 parser.add_argument('--file','-f',      action="store",      dest="vmkfilepath",    default=False,  help='VMK build template file',           nargs='*')
-parser.add_argument('--build','-b',     action="store_true", dest="build",          default=False,  help='VMK build template file')
+parser.add_argument('--build','-b',     action="store_true", dest="build",          default=False,  help='Build file')
+parser.add_argument('--noop','-n',      action="store_true", dest="noop",           default=False,  help='Displays provider output only')
 parser.add_argument('--variables',      action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
 parser.add_argument('--show-variables', action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vmk file')
 parser.add_argument('--show-template',  action="store_true", dest='show_template',  default=False,  help='Shows the input template for a given *.vmk file')
