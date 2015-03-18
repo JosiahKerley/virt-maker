@@ -7,6 +7,7 @@ import json
 import shutil
 import urllib2
 import hashlib
+import argparse
 import cPickle as pickle
 from distutils.spawn import find_executable
 
@@ -28,17 +29,27 @@ for dir in dirs:
 def verbose(text,label='INFO'):
 	print('\t%s: %s'%(label,text))
 
-## Parses DSL
-def dsl2dict(text):
-	providerchar = '@'
-	mutatestr = '<[%s]>'
+
+## Parses DSL Variables
+def dsl2opt(text,providerchar='@'):
+	options = {}
 	text = '\n'+text
 	text = text.replace('\n%s'%(providerchar),'\n\n%s'%(providerchar))
 	headertext = text.split('%s'%(providerchar))[0]
 	for i in headertext.split('\n'):
 		if '=' in i:
-			key = mutatestr%(i.split('=')[0])
+			key = i.split('=')[0]
 			val = i.split('=')[1]
+			options[key] = val
+	return(options)
+
+
+## Parses DSL Statements
+def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
+	if options:
+		for i in options:
+			key = mutatestr%(i.split('=')[0])
+			val = options[i]
 			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
@@ -55,6 +66,7 @@ def dsl2dict(text):
 		)
 	sections.remove(sections[0]) ## Remove blank entry
 	return(sections)
+
 
 ## Download files from url
 def fetch(url,dest):
@@ -129,73 +141,153 @@ class Image:
 		os.system(cmd)
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
 
-## Get vmk contents
-try:
-	with open(sys.argv[-1],'r') as f: filetext = f.read()
-except:
-	print('Cannot open *.vmk file')
-	sys.exit(False)
 
-## Main
-'/'.join(sys.argv[-1].split('/')[:-1])
-vmkdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
-workingdir = (vmkdir+'/.virt-maker')
-image = Image()
-cwd = os.getcwd()
-chain = []
-cache = True
-steps = 0
-lasthash = None
 
-## Setup workspace
-if not os.path.isdir(workingdir):
-	os.makedirs(workingdir)
-os.chdir(workingdir)
-image.setup()
-chain = json.loads(json.dumps(image.chain))
-chain.reverse()
-link = chain.pop()
-providerdir = '%s/providers'%(settings['varlib'])
 
-## Execute sections
-for section in dsl2dict(filetext):
-	steps += 1
-	providerscript = '%s/%s.py'%(providerdir,section['provider'])
+## Build VMK file
+def build(template):
 
-	## Handles the providers
-	print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
-	try: link = chain.pop()
-	except: link = None
-	if link == section['hash'] and cache:
-		pass
-	else:
-		cache = False
-		if not os.path.isfile(providerscript):
-			if not find_executable(section['provider']) == None:	## Handles arbitrary commands
-				if settings['verbose']:
-					cmd = '%s %s'%(section['provider'],section['argument'])
-					print(cmd)
+	## Main
+	'/'.join(sys.argv[-1].split('/')[:-1])
+	vmkdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
+	workingdir = (vmkdir+'/.virt-maker')
+	image = Image()
+	cwd = os.getcwd()
+	chain = []
+	cache = True
+	steps = 0
+	lasthash = None
+
+	## Setup workspace
+	if not os.path.isdir(workingdir):
+		os.makedirs(workingdir)
+	os.chdir(workingdir)
+	image.setup()
+	chain = json.loads(json.dumps(image.chain))
+	chain.reverse()
+	link = chain.pop()
+	providerdir = '%s/providers'%(settings['varlib'])
+
+	## Execute sections
+	for section in template:
+		steps += 1
+		providerscript = '%s/%s.py'%(providerdir,section['provider'])
+
+		## Handles the providers
+		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
+		try: link = chain.pop()
+		except: link = None
+		if link == section['hash'] and cache:
+			pass
+		else:
+			cache = False
+			if not os.path.isfile(providerscript):
+				if not find_executable(section['provider']) == None:	## Handles arbitrary commands
+					if settings['verbose']:
+						cmd = '%s %s'%(section['provider'],section['argument'])
+						print(cmd)
+					else:
+						cmd = '%s %s >/dev/null 2>&1'%(section['provider'],section['argument'])
+					retval = os.system(cmd)
+					if not retval == 0:
+						print retval
+						print('ERROR!')
+						sys.exit(1)
 				else:
-					cmd = '%s %s >/dev/null 2>&1'%(section['provider'],section['argument'])
-				retval = os.system(cmd)
+					print 'Cannot find provider script "%s"'%(providerscript)
+					exit(1)
+			else:
+				module = imp.load_source(section['provider'], providerscript)
+				retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
 					print('ERROR!')
 					sys.exit(1)
-			else:
-				print 'Cannot find provider script "%s"'%(providerscript)
-				exit(1)
-		else:
-			module = imp.load_source(section['provider'], providerscript)
-			retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
-			if not retval == 0:
-				print retval
-				print('ERROR!')
-				sys.exit(1)
-			try: image.snapshot(section['hash'])
-			except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
-	image.chainlink(section['hash'])
-	lasthash = section['hash']
+				try: image.snapshot(section['hash'])
+				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
+		image.chainlink(section['hash'])
+		lasthash = section['hash']
 
-## Finish
-os.chdir(cwd)
+	## Finish
+	os.chdir(cwd)
+
+
+
+
+
+## Arguments
+parser = argparse.ArgumentParser(description='Libvirt based VM builder')
+parser.add_argument('--file','-f',      action="store",      dest="vmkfilepath",    default=False,  help='VMK build template file',           nargs='*')
+parser.add_argument('--build','-b',     action="store_true", dest="build",          default=False,  help='VMK build template file')
+parser.add_argument('--variables',      action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
+parser.add_argument('--show-variables', action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vmk file')
+parser.add_argument('--show-template',  action="store_true", dest='show_template',  default=False,  help='Shows the input template for a given *.vmk file')
+#arser.add_argument('--output-format',  action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
+parser.add_argument('--input-format',   action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
+parser.add_argument('--pretty','-p',    action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
+parser.add_argument('--version',        action='version',    version='%(prog)s 1.0')
+results = parser.parse_args()
+
+
+## Execute
+if results.vmkfilepath:
+	for vmk in results.vmkfilepath:
+		with open(vmk,'r') as f: filetext = f.read()
+		options = dsl2opt(filetext)
+		if results.overridevars:
+			for i in results.overridevars:
+				if results.input_format.lower() == 'key':
+					options = dict(options.items()+dsl2opt(i).items())
+				elif results.input_format.lower() == 'json':
+					options = dict(options.items()+json.loads(i).items())
+		template = dsl2dict(filetext,options)
+		if results.show_variables:
+			if results.pretty:
+				print(json.dumps(options,indent=2))
+			else:
+				print(json.dumps(options))
+		if results.show_template:
+			if results.pretty:
+				print(json.dumps(template,indent=2))
+			else:
+				print(json.dumps(template))
+		if results.build: build(template)
+else:
+	raise('No input file specified')
+	sys.exit(1)
+
+'''
+## Get vmk contents
+try:
+	
+	build(filetext)
+except:
+	print('Cannot open *.vmk file')
+	sys.exit(False)
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
