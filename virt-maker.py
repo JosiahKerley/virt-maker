@@ -39,7 +39,7 @@ def dsl2opt(text,providerchar='@'):
 	for i in headertext.split('\n'):
 		if '=' in i:
 			key = i.split('=')[0]
-			val = i.split('=')[1]
+			val = '='.join(i.split('=')[1:])
 			options[key] = val
 	return(options)
 
