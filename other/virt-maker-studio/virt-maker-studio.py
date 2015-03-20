@@ -80,7 +80,21 @@ class Repo:
 
 
 ##-> MAIN APP <-##
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='html')
+
+
+
+## Serve static files
+@app.route('/')
+def index():
+    return(send_from_directory('html', 'index.html'))
+
+
+
+## Serve static files
+@app.route('/<path>')
+def staticFiles(path):
+    return(send_from_directory('html', path))
 
 
 
