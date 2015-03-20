@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Virt-Maker Studio</title>
+		<link rel="stylesheet" href="codebase/webix.css" type="text/css" charset="utf-8">
+		<script src="codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript" charset="utf-8">
+			var rxjsonreq = webix.ajax().get("http://10.0.0.82/repos/test");
+			var rxjson = rxjsonreq.responseText;
+			webix.message(rxjson);
+			webix.message(rxjsonreq);
+			webix.ajax("http://10.0.0.82/repos/test", function(text){
+				webix.message(text); //show server side response
+			});
+			//files_data = [ {type: "folder",id: 1,value: "/var/lib/virt-maker/studio/repos/test", data: [{type: "folder",id: 1,value: "/var/lib/virt-maker/studio/repos/test" }]} ];
+			var files_data = [ {type: "folder",value: "some", data:[{value:"file"}]} ];
+			files_data = '[ { "data": [ { "value": "file" } ], "type": "folder", "value": "sdf" } ]';
+			webix.ui({
+				rows : [{
+					type : "header",
+					template : "Virt-Maker Studio"
+				}, {
+					cols : [{
+						view : "tree",
+						data : files_data,
+						//data:function(){this.load("http://10.0.0.82/repos/test")},
+						//url:"http://10.0.0.82/repos/test",
+						gravity : 0.3,
+						select : true
+					}, {
+						view : "resizer"
+					}, {
+						view : "textarea",
+						url:"http://10.0.0.82/repos/test",
+					}]
+				}]
+			});
+		</script>
+	</body>
+</html>
