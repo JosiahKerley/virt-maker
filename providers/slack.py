@@ -7,7 +7,7 @@ import urllib2
 values = {
 	"username": "Virt-Maker",
 	"text": None,
-	"construction": ":ghost:",
+	"icon_emoji":"construction",
 	"channel": None
 	}
 
