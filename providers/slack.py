@@ -1,6 +1,5 @@
 import os
 import json
-import reques
 import urllib2
 
 
