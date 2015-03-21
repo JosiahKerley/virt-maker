@@ -1,6 +1,6 @@
 #!/bin/bash
-if ! which pip; yum install -y python-pip; fi
-if ! ls /usr/lib/python2.7/site-packages/jinja2; pip install jinja2; fi
+if ! which pip; then yum install -y python-pip; fi
+if ! ls /usr/lib/python2.7/site-packages/jinja2; then pip install jinja2; fi
 cat virt-maker.py > /usr/bin/virt-maker
 chmod +x /usr/bin/virt-maker
 mkdir -p /var/lib/virt-maker/providers
