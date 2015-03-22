@@ -131,6 +131,13 @@ Usage:
   -Runs virt-sysprep on snapshot-
 Usage:
 @sysprep
+
+
+@slack
+  -Posts a message to slack-
+Usage:
+@slack <[Channel]> <[Token]>
+<[MultiLineMessageBody]>
 ```
 
 
