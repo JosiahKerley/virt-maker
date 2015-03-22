@@ -4,7 +4,7 @@ Be advised, this is still pretty early.  I'm still hammering out details with th
 
 Command Line:
 =============
-
+```
 usage: virt-maker.py [-h] [--file [VMKFILEPATH [VMKFILEPATH ...]]] [--build]
                      [--noop] [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]]
                      [--show-variables] [--show-template]
@@ -26,7 +26,7 @@ optional arguments:
                         Set the input format (JSON|Key). Default KEY
   --pretty, -p          Displays output in easily readable format
   --version             show program's version number and exit
-
+```
   
 Example:
 ========
