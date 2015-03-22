@@ -138,6 +138,15 @@ Usage:
 Usage:
 @slack <[Channel]> <[Token]>
 <[MultiLineMessageBody]>
+
+
+@deploy
+  -Creates domain on server-
+Usage:
+@deploy <[PathToImage]>
+name=<[NameOfDomain]>
+network=<[HostNetworking]>
+ram=<[AmountOfRAM]>
 ```
 
 
@@ -354,7 +363,7 @@ umask 002
 @cp <[HOSTNAME]>.<[DOMAIN]> /var/lib/libvirt/images/<[HOSTNAME]>.<[DOMAIN]>
 @virsh destroy <[HOSTNAME]>
 @virsh undefine <[HOSTNAME]>
-@create /var/lib/libvirt/images/<[HOSTNAME]>.<[DOMAIN]>
+@deploy /var/lib/libvirt/images/<[HOSTNAME]>.<[DOMAIN]>
 name=<[HOSTNAME]>
 network=type=direct,source=<[HOSTDEV]>,model=virtio
 ram=2048
