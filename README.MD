@@ -2,6 +2,13 @@ Note:
 =====
 Be advised, this is still pretty early.  I'm still hammering out details with the DSL and provider modules (as well as things like whether or not I want to incorporate jinja2)
 
+
+About:
+======
+
+This is tool that allows you to write a fairly simple template (or script if you prefer) that performs operations on Libvirt based VMs.
+
+
 Command Line:
 =============
 ```
@@ -48,6 +55,86 @@ echo HelloWord!
 echo It is currently:
 date
 ```
+
+These are strung together as:
+```
+@run echo HelloWorld!
+@script
+echo HelloWord!
+echo It is currently:
+date
+```
+
+There is also a simple key:value replacement functionality as well.  A declaration looks like this:
+```
+SomeKey=SomeValue
+@run echo <[SomeKey]>
+```
+
+The only caveat currently is that ALL of these key values must be placed at the top of the temaplate before any provider declarations.
+
+
+Providers:
+==========
+Providers are methods that are called to perform an operation on the snapshot.
+Providers are simple and easily extendible modules (think python imp) that can be written quickly.
+By default, if there is not an provider module for a given declaration and the host has the equivalent
+command, the provider will be executed as bash command on the HOST instead.
+
+*Important providers:*
+```
+@import:
+  -imports an image into the snapshot buildchain-
+
+Usage:
+@import <[PathToImage]>
+
+
+@export
+  -exports an image into the snapshot buildchain-
+Usage:
+@export <[PathToExportImage]>
+
+
+@run
+  -runs a command in the chroot mounted snapshot of the guest being built-
+Usage:
+@run <[SomeCommand]>
+
+
+@file
+  -Created a text file on the snapshot-
+Usage:
+@file <[FilePathOnSnapshot]>
+<[MultilineFileContents]>
+
+
+@scripts
+  -Runs a script on the snapshot-
+Usage:
+@script <[OptionalPathOfExecutor]>
+<[MultilineScriptContents]>
+
+
+@hostname
+  -Sets the hostname of the snapshot-
+Usage:
+@hostname <[SomeHostname]>
+
+
+@install
+  -Installs a package on the snapshot-
+Usage:
+@install <[SomePackage]>
+
+
+@sysprep
+  -Runs virt-sysprep on snapshot-
+Usage:
+@sysprep
+```
+
+
 
 Example:
 ========
