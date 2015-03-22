@@ -31,7 +31,14 @@ optional arguments:
 Example:
 ========
 ```
-## Example: virt-maker --build --file rundeck-dev.vmk --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
+##                         Build: virt-maker --build --file rundeck.vmk
+##           Show variables used: virt-maker --file rundeck.vmk --show-variables --pretty
+## Build with override variables: virt-maker --build --file rundeck.vmk --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
+##
+##    VMK File contents:
+##
+##
+
 
 ##->Variables<-##
 
