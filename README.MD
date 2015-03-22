@@ -30,7 +30,7 @@ optional arguments:
   
 Example:
 ========
-
+```
 #####################################
 #                                   #
 #     Rundeck server build for      #
@@ -246,3 +246,4 @@ ram=2048
 ## Post slack message
 @slack <[SLACKCHANNEL]> <[SLACKKEY]>
 Build "<[HOSTNAME]>" Complete
+```
