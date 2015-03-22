@@ -27,7 +27,28 @@ optional arguments:
   --pretty, -p          Displays output in easily readable format
   --version             show program's version number and exit
 ```
-  
+
+
+DSL
+===
+The temaplate's DSL user the following form:
+```
+@provider arguments
+body of
+the declaration
+```
+Providers don't necessarily have to use both arguments and a body.  For example:
+```
+@run echo HelloWorld!
+```
+and vice-versa:
+```
+@script
+echo HelloWord!
+echo It is currently:
+date
+```
+
 Example:
 ========
 ```
