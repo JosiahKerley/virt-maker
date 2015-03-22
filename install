@@ -1,6 +1,10 @@
 #!/bin/bash
+if ! which redis-cli; then yum install -y redis; fi
 if ! which pip; then yum install -y python-pip; fi
 if ! ls /usr/lib/python2.7/site-packages/jinja2; then pip install jinja2; fi
+if ! ls /usr/lib/python2.7/site-packages/redis; then pip install redis; fi
+if ! ls /usr/lib/python2.7/site-packages/pexpect; then pip install pexpect; fi
+if ! ls /usr/lib/python2.7/site-packages/flask; then pip install flask; fi
 cat virt-maker.py > /usr/bin/virt-maker
 chmod +x /usr/bin/virt-maker
 mkdir -p /var/lib/virt-maker/providers
