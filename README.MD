@@ -31,14 +31,7 @@ optional arguments:
 Example:
 ========
 ```
-#####################################
-#                                   #
-#     Rundeck server build for      #
-# automated test enviroment in APSD #
-#                                   #
-#####################################
-
-## Example: virt-maker --build --file autotest-rundeck-dev.vmk --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
+## Example: virt-maker --build --file rundeck-dev.vmk --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
 
 ##->Variables<-##
 
