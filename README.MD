@@ -38,7 +38,7 @@ optional arguments:
 
 DSL
 ===
-The temaplate's DSL user the following form:
+The template's DSL user the following form:
 ```
 @provider arguments
 body of
@@ -85,7 +85,6 @@ command, the provider will be executed as bash command on the HOST instead.
 ```
 @import:
   -imports an image into the snapshot buildchain-
-
 Usage:
 @import <[PathToImage]>
 
@@ -103,7 +102,7 @@ Usage:
 
 
 @file
-  -Created a text file on the snapshot-
+  -Create a text file on the snapshot-
 Usage:
 @file <[FilePathOnSnapshot]>
 <[MultilineFileContents]>
@@ -136,8 +135,11 @@ Usage:
 
 
 
-Example:
+Examples:
 ========
+
+Create an nginx proxied rundeck server an deploy it with a macvtap
+
 ```
 ##                         Build: virt-maker --build --file rundeck.vmk
 ##           Show variables used: virt-maker --file rundeck.vmk --show-variables --pretty
