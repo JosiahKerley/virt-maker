@@ -7,7 +7,7 @@ import urllib2
 values = {
 	"username": "Virt-Maker",
 	"text": None,
-	"icon_emoji":"construction",
+	"icon_emoji":":construction:",
 	"channel": None
 	}
 
@@ -20,6 +20,6 @@ def provider(body,hash,args,verbose,image,settings):
 	req = urllib2.Request(url, data)
 	response = urllib2.urlopen(req)
 	the_page = response.read()
-	return(True)
+	return(0)
 	
 	
