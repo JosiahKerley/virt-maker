@@ -4,39 +4,211 @@
 		<title>Virt-Maker Studio</title>
 		<link rel="stylesheet" href="codebase/webix.css" type="text/css" charset="utf-8">
 		<script src="codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="codebase/filemanager/filemanager.css">
 	</head>
 	<body>
 		<script type="text/javascript" charset="utf-8">
-			var rxjsonreq = webix.ajax().get("http://10.0.0.82/repos/test");
-			var rxjson = rxjsonreq.responseText;
-			webix.message(rxjson);
-			webix.message(rxjsonreq);
-			webix.ajax("http://10.0.0.82/repos/test", function(text){
-				webix.message(text); //show server side response
-			});
-			//files_data = [ {type: "folder",id: 1,value: "/var/lib/virt-maker/studio/repos/test", data: [{type: "folder",id: 1,value: "/var/lib/virt-maker/studio/repos/test" }]} ];
-			var files_data = [ {type: "folder",value: "some", data:[{value:"file"}]} ];
-			files_data = '[ { "data": [ { "value": "file" } ], "type": "folder", "value": "sdf" } ]';
-			webix.ui({
-				rows : [{
-					type : "header",
-					template : "Virt-Maker Studio"
-				}, {
-					cols : [{
-						view : "tree",
-						data : files_data,
-						//data:function(){this.load("http://10.0.0.82/repos/test")},
-						//url:"http://10.0.0.82/repos/test",
-						gravity : 0.3,
-						select : true
-					}, {
-						view : "resizer"
-					}, {
-						view : "textarea",
-						url:"http://10.0.0.82/repos/test",
+			webix.ready(function() {
+
+				// Globals
+				var selectedView = "form";
+
+
+
+
+				//->UI<-//
+				webix.ui({
+
+					rows : [{
+						id : "header",
+						type : "header",
+						template : "Virt-Maker Studio",
+					},  {
+						cols : [
+							{
+								id:"left-window",
+								width:200,
+								rows:[
+									{
+										id : "filebrowser",
+										view : "tree",
+										select : true,
+										clipboard : true,
+										url : "/api/repos",
+										drag : true,
+										gravity : 0.3,
+										select : true,
+										//height:800,
+										position:"top",
+										onContext:{}
+									},
+									{
+										view : "resizer"
+									},
+									{
+    									view:"list",
+    									position:"bottom",
+										data:[]
+									},
+
+								],
+							},
+						
+							{
+								view : "resizer"
+							}, 
+						
+						
+						
+						// Main Panel
+						{
+							id:"main",
+							rows:[
+								// Text editor
+								{
+									id : "texteditor",
+									rows:[
+										{
+											view:"toolbar",
+											id:"texteditor-toolbar",
+    										cols:[
+        										{ view:"button", value:"Save", width:100, align:"right" }]
+										},
+										{
+											id : "texteditor-main",
+											view : "textarea",
+											value : "",
+											apifilepath : null,
+										},
+									],
+								},
+
+								// Deploy panel
+								{
+    								view:"form", 
+    								id:"deployform",
+    								hidden:true,
+    								elements:[],
+    							}
+							]
+						},
+						
+
+
+
+
+						]
 					}]
-				}]
+
+				});
+			
+			
+				// Context menu
+				webix.ui({
+				    view:"contextmenu",
+				    master:$$('filebrowser'),
+    				id:"filemenu",
+    				data:[
+    			    	{
+    			    		value:"Open in Editor",
+						},
+    			    	{
+    			    		value:"Open in Builder",
+						},
+						{ $template:"Separator" },
+						{
+							value:"Git",
+							submenu:[
+								{value:"New Repository"},
+								{value:"Add/Commit/Push"},
+								{value:"Pull Changes"},
+							]
+						},
+					],
+				});
+
+		
+
+
+				//->Events<-//
+
+
+			// Global Functions //
+			function refreshViews(obj, id){
+				var apifilepath = obj.getItem(id).content;
+				webix.ajax(obj.getItem(id).content, function(text) {
+					$$("texteditor-main").define("value", text);
+					$$("texteditor-main").define("apifilepath", apifilepath);
+					$$("texteditor-main").refresh();
+				});
+				webix.ajax(obj.getItem(id).variables, function(text) {
+					formlayout = JSON.parse(text);
+					formlayout.push({ margin:5, cols:[{ view:"button", value:"Build" , type:"form" },{ view:"button", value:"NoOp" }]});
+					webix.ui(formlayout, $$('deployform'));
+				});
+			};
+
+
+			// Filebrowser menu actions
+			$$("filemenu").attachEvent("onItemClick", function(id){
+    			webix.message(this.getItem(id).value);
+    			if (this.getItem(id).value == "Open in Editor"){
+    				$$("texteditor").show();
+    				$$("deployform").hide();
+    			};
+    			if (this.getItem(id).value == "Open in Builder"){
+    				$$("texteditor").hide();
+    				$$("deployform").show();
+    			};
 			});
+
+
+				// Actions when file/folder is clicked
+				$$("filebrowser").attachEvent("onAfterSelect", function(id) {
+					if (this.getItem(id).type == 'file') {
+						refreshViews(this, id);
+					};
+					//webix.message(this.getItem(id).value);
+				});
+
+
+				// Actions when file/folder is edited
+				$$("texteditor-main").attachEvent("onKeyPress", function() {
+					var writebackpath = this.data.apifilepath;
+					if (writebackpath == null) {
+						webix.message('No file selected');
+						$$("texteditor-main").setValue('');
+					} else {
+						webix.ajax().post(writebackpath, {
+							"data" : $$("texteditor-main").getValue()
+						});
+					};
+				});
+				$$("texteditor-main").attachEvent("onChange", function() {
+					var writebackpath = this.data.apifilepath;
+					if (writebackpath == null) {
+						webix.message('No file selected');
+						$$("texteditor-main").setValue('');
+					} else {
+						webix.ajax().post(writebackpath, {
+							"data" : $$("texteditor-main").getValue()
+						});
+					};
+					webix.extend($$("texteditor-main"), webix.ProgressBar);
+					$$("texteditor-main").showProgress({
+						type : "top",
+						delay : 3000,
+						hide : true
+					});
+				});
+			});
+
+			
+
+			
+			
+
+
 		</script>
 	</body>
 </html>

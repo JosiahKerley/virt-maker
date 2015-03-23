@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Basic init</title>
+		<meta  name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no">
+
+		<script src="../../../codebase/webix.js" type="text/javascript"></script>
+		<script src="../../../codebase/filemanager/filemanager.js" type="text/javascript"></script>
+
+		<link rel="stylesheet" type="text/css" href="codebase/webix.css">
+		<link rel="stylesheet" type="text/css" href="codebase/filemanager/filemanager.css">
+
+	</head>
+	<body>
+		<script type="text/javascript">
+			webix.ready(function() {
+				webix.ui({
+					view : "filemanager",
+					id : "files",
+					url : "/api/repos",
+				});
+			});
+		</script>
+	</body>
+</html>

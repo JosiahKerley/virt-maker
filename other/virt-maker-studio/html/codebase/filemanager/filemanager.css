@@ -1,0 +1,57 @@
+/*
+@license
+webix UI v.2.2.3
+This software is can be used only as part of webix.com site
+You are not allowed to copy this file and use in any other project
+*/.webix_fmanager_toolbar{background-color:#fdfdfd}
+.webix_fmanager_toolbar .webixtype_base{background-color:transparent;border-color:#bbb;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%}
+.webix_fmanager_toolbar .webixtype_base .webix_icon{color:#777}
+.webix_fmanager_back .webix_icon,.webix_fmanager_forward .webix_icon,.webix_fmanager_up .webix_icon{width:100%;margin-left:0;text-align:center}
+.webix_filemanger_back .webix_icon,.webix_filemanger_next .webix_icon{font-size:22px;font-weight:700}
+.webix_fmanager .webix_path{background-color:transparent}
+.webix_path .webix_list_item:before{color:#888;font-family:FontAwesome;content:"\f105";padding-right:10px}
+.webix_path .webix_list_item:first-child:before{content:"";padding-right:0}
+.webix_path .webix_list_item{padding-left:2px;border:none}
+.webix_path{box-sizing:border-box;padding:3px 2px;overfow:hidden}
+.webix_path .webix_list_item:first-child{padding-left:10px}
+.webix_fmanager_modes .webix_segment_0,.webix_fmanager_modes .webix_segment_1,.webix_fmanager_modes .webix_segment_N{background-color:transparent;border-color:#fff;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%;color:#777}
+.webix_fmanager_modes .webix_selected.webix_segment_0,.webix_fmanager_modes .webix_selected.webix_segment_1,.webix_fmanager_modes .webix_selected.webix_segment_N{background-color:#d3f6e2;border:1px solid #27ae60;color:#666}
+.webix_fmanager_body.webix_view{background-color:#f8f8f8;box-shadow:inset 0 1px 3px #eaeaea}
+.webix_fmanager_tree .webix_icon{color:#709fbe;padding-left:52x!important;text-align:center}
+.webix_fmanager_tree .webix_tree_item span{padding-right:5px}
+.webix_fmanager_tree .webix_tree_item.webix_selected span{margin-left:-3px}
+.webix_fmanager_tree.webix_view{background-color:#f3f3f3}
+.webix_fmanager_tree .webix_dt_editor{height:29px!important}
+.webix_fmanager_files .webix_dataview_item{border-color:#fff;border-right-color:#fff;padding:10px 10px 1px 1px}
+.webix_fmanager_files .webix_dataview_item:first-child{padding-left:10px}
+.webix_fmanager_files .webix_dataview_item.webix_selected{background-color:transparent}
+.webix_fmanager_files .webix_dataview_item.webix_selected,.webix_fmanager_files .webix_dataview_item.webix_drag_over{background-color:transparent}
+.webix_drag_over .webix_fmanager_file,.webix_fmanager_table .webix_column>.webix_drag_over.webix_cell,.webix_fmanager_table .webix_column>.webix_drag_over.webix_cell .webix_icon,.webix_fmanager_tree .webix_drag_over{background-color:#d3f6e2;color:#666}
+.webix_fmanager_table .webix_column>.webix_drag_over.webix_cell .webix_icon{color:#888}
+.webix_fmanager_drag .webix_icon{color:#888}
+.webix_fmanager_file{font-size:14px;line-height:20px;text-align:center;width:100%;height:100%;box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;-webkit-box-sizing:border-box;overflow:hidden;word-break:break-all}
+.webix_fmanager_files .webix_selected .webix_fmanager_file{background:#27ae60}
+.webix_selected .webix_fmanager_icon.webix_icon{color:#fff}
+.webix_blur .webix_selected{background-color:#d3f6e2}
+.webix_blur.webix_fmanager_files .webix_selected .webix_fmanager_file{background-color:#d3f6e2}
+.webix_blur .webix_selected{color:#666}
+.webix_fmanager_files .webix_icon{padding-top:10px;width:40px;padding-bottom:5px;font-size:40px;color:#709fbe}
+.webix_fmanager_icon.webix_icon{color:#709fbe}
+.webix_row_select .webix_fmanager_icon.webix_icon{color:#fff}
+.webix_blur .webix_fmanager_icon.webix_icon{color:#709fbe}
+.webix_fmanager_icon.fa-file-word-o,.webix_blur .webix_fmanager_icon.fa-file-word-o{color:#63b4ea}
+.webix_fmanager_icon.fa-file-pdf-o .webix_blur .webix_fmanager_icon.fa-file-pdf-o{color:#eb6e1a}
+.webix_fmanager_icon .fa-file-excel-o,.webix_blur .webix_fmanager_icon.fa-file-excel-o{color:#39be71}
+.webix_fmanager_icon.fa-file-powerpoint-o,.webix_blur.webix_fmanager_icon.fa-file-powerpoint-o{color:#eb6e1a}
+.webix_fmanager_icon.fa-file-video-o,.webix_blur .webix_fmanager_icon.fa-file-video-o{color:#a693eb}
+.webix_fmanager_icon.fa-file-image-o,.webix_blur .webix_fmanager_icon.fa-file-image-o{color:#d76956}
+.webix_fmanager_icon.fa-file-archive-o,.webix_blur .webix_fmanager_icon .fa-file-archive-o{color:#e1c74d}
+.webix_fmanager_actions .webix_icon{margin-right:5px;color:#777}
+.webix_blur .webix_tree_item.webix_selected{background-color:transparent}
+.webix_blur .webix_tree_item.webix_selected span{background-color:#d3f6e2;padding:3px 10px 3px 4px;border:1px solid #27ae60;color:#666;box-sizing:border-box}
+.webix_blur .webix_column>div.webix_cell_select,.webix_blur .webix_column>div.webix_column_select,.webix_blur .webix_column>div.webix_row_select{color:#666;background-color:#d3f6e2}
+.webix_fmanager_drag>div{vertical-align:top}
+.webix_fmanager_save_message{position:absolute;bottom:30px;right:30px;width:auto;height:auto;z-index:100;font-family:'PT Sans',Tahoma;font-size:14px}
+.webix_upload_select_ie button{background:#fff;color:#666;border-color:#fff}
+.webix_upload_select_ie:hover button{background:rgba(100,100,100,.1)}
+.webix_upload_select_ie button .webix_icon{color:#666}

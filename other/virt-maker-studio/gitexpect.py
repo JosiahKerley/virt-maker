@@ -47,6 +47,8 @@ class Git:
 				return({'error':'%s is not empty'}%(directory))
 		if not os.path.isdir(directory): os.makedirs(directory)
 		os.chdir(directory)
+		print '!!!!'
+		os.system('pwd')
 		cmd = 'git clone %s -b %s .'%(self.url,self.branch)
 		print(cmd)
 		exp = pexpect.spawn(cmd)
