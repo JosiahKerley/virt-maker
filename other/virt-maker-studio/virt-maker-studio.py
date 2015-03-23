@@ -216,7 +216,6 @@ class Builder:
 		filepath = filepath.lstrip('%s/'%(repo))
 		content = '/api/files/%s/content/%s'%(repo,filepath)
 		response = {
-				"_usage":"GET to read stdout, DELETE to kill the process (if running)",
 				"repo":repo,
 				"filename":filepath.split('/')[-1],
 				"filepath":filepath,
@@ -234,12 +233,10 @@ class Builder:
 		r.set(self.tag(id),'')
 		while proc.poll() is None:
 			output = proc.stdout.readline()
-			if r.get(self.tag(id)) == False:
-				print '!!!!!!!!!!!!!!!!!!!'
+			newval = '%s%s'%(r.get(self.tag(id)),output)
+			if r.get('%s_kill'%(id)) == 'True':
 				proc.kill()
 				newval = '<PROCESS KILLED %s>'%(str(int(time.time())))
-			else:
-				newval = '%s%s'%(r.get(self.tag(id)),output)
 			r.set(self.tag(id),newval)
 			#r.expire(self.tag(id),900)
 
@@ -453,10 +450,8 @@ def buildTemplate(path):
 def buildConsole(id):
 	builder = Builder()
 	if request.method == 'DELETE':
-		r.set(builder.tag(id),False,30)
+		r.set('%s_kill'%(builder.tag(id)),'True')
 	return(builder.console(builder.tag(id)))
-
-
 
 
 
