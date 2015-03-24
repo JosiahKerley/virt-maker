@@ -198,15 +198,17 @@ def build(template,noop=False):
 					exit(1)
 			else:
 				module = imp.load_source(section['provider'], providerscript)
+				retval = 0
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
 					print('ERROR!')
 					sys.exit(1)
-				try: image.snapshot(section['hash'])
+				try:
+					if not noop: image.snapshot(section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
-		image.chainlink(section['hash'])
-		lasthash = section['hash']
+		if not noop: image.chainlink(section['hash'])
+		if not noop: lasthash = section['hash']
 
 	## Finish
 	os.chdir(cwd)
@@ -252,7 +254,7 @@ if results.vmkfilepath:
 				print(json.dumps(template,indent=2))
 			else:
 				print(json.dumps(template))
-		if results.build: build(template)
+		if results.build: build(template,results.noop)
 else:
 	raise('No input file specified')
 	sys.exit(1)

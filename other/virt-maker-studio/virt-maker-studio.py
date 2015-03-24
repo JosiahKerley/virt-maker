@@ -7,6 +7,7 @@ import uuid
 import redis
 import shutil
 #import bcrypt
+import urllib2
 import subprocess
 from gitexpect import Git
 from urlparse import urlparse
@@ -111,6 +112,10 @@ class Repo:
 		os.chdir(cwd)
 		return(full)
 
+	def listrepos(self):
+		repos = os.listdir('%s/%s'%(settings['workspace'],self.gitdir))
+		return(repos)
+
 	def repofiles(self,name,type='tree'):
 		if type == 'tree':
 			if self.repopath(name):
@@ -123,10 +128,6 @@ class Repo:
 			else:
 				return(False)
 
-	def listrepos(self):
-		os.chdir(settings['workspace'])
-		repolist = os.listdir('repos')
-		return(repolist)
 
 
 ## Handles file operations
@@ -216,6 +217,7 @@ class Builder:
 		filepath = filepath.lstrip('%s/'%(repo))
 		content = '/api/files/%s/content/%s'%(repo,filepath)
 		response = {
+					"_usage":"Use GET/DELETE verbs to read console stdout and file contents",
 					"id":id,
 					"repo":repo,
 					"value":filepath.split('/')[-1],
@@ -225,7 +227,6 @@ class Builder:
 					"content":content,
 					"stdout":"/api/builds/console/%s"%(id),
 					"status":"/api/builds/status/%s"%(id),
-					#"image":"/codebase/images/console.png",
 				}
 		return(response)
 
@@ -292,11 +293,24 @@ def mainpage():
 	os.chdir(settings['workspace'])
 	apidoc = {
 				"resources":{
-								"repos":"/api/repos"
+								"repos":"/api/repos",
+								"builds":"/api/builds",
+								"files":"/api/files",
 							}
 			}
 	html = json.dumps(apidoc,indent=2)
 	os.chdir(cwd)
+	return(html)
+
+
+
+
+
+## View readme
+@app.route('/api/readme', methods=['GET'])
+def readMe():
+	url = "https://raw.githubusercontent.com/JosiahKerley/virt-maker/master/README.MD"
+	html = urllib2.urlopen(url).read()
 	return(html)
 
 
@@ -373,12 +387,22 @@ def newRepo():
 
 
 ## View all repos
+@app.route('/api/files', methods=['GET'])
+def allFiles():
+	repo = Repo()
+	files = repo.listrepos()
+	html = json.dumps(files,indent=2)
+	return(html)
+
+
+## View all repos
 @app.route('/api/files/<root>', methods=['GET'])
 def repoFiles(root):
 	repo = Repo()
 	files = repo.repofiles(root,'list')
 	html = json.dumps(files,indent=2)
 	return(html)
+
 
 ## Read/write file contents
 @app.route('/api/files/<root>/content/<path:path>', methods=['GET','POST','DELETE'])
@@ -424,14 +448,15 @@ def listBuilds():
 	repo = Repo()
 	files = Files()
 	builder = Builder()
-	html = json.dumps(json.loads(r.get(tag)),indent=2)
+	try: html = json.dumps(json.loads(r.get(tag)),indent=2)
+	except: html = r.get(tag)
 	#html = '[{"value":"some-build"}]'
 	return(html)
 
 
 
 
-## Load file input variables
+## Build file
 @app.route('/api/builds/<path:path>', methods=['POST'])
 def buildTemplate(path):
 	tag = 'vms_builds'
@@ -443,6 +468,30 @@ def buildTemplate(path):
 	for i in form:
 		flatform[i] = form[i][0]
 	retval = builder.build(path,flatform)
+	print retval
+	if r.get(tag) == None:
+		newval = [retval]
+	else:
+		currentval = json.loads(r.get(tag))
+		newval = [retval]
+		newval += currentval
+	r.set(tag,json.dumps(newval))
+	html = json.dumps(retval,indent=2)
+	return(html)
+
+
+## Noop file
+@app.route('/api/builds/noop/<path:path>', methods=['POST'])
+def noopTemplate(path):
+	tag = 'vms_builds'
+	repo = Repo()
+	files = Files()
+	builder = Builder()
+	form = dict(request.form)
+	flatform = {}
+	for i in form:
+		flatform[i] = form[i][0]
+	retval = builder.build(path,flatform,noop='--noop')
 	if r.get(tag) == None:
 		newval = [retval]
 	else:

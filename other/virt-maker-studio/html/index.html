@@ -10,6 +10,7 @@
         		background:#202020;
         		color:white;
         		font-family: "Courier New", Courier, monospace;
+        		font-size: 10px;
     		}
 		</style>
 	</head>
@@ -25,7 +26,7 @@
 
 				//->UI<-//
 				webix.ui({
-
+					
 					rows : [{
 						id : "header",
 						type : "header",
@@ -57,8 +58,13 @@
     									view:"list",
     									id:"buildstatus",
     									position:"bottom",
-										//data:[],
 										url:'/api/builds',
+										template: function (obj) {
+											var buildstatus = "unknown";
+											//webix.ajax(obj.status, function(text) {buildstatus = text;});
+											webix.message(buildstatus);
+											return '<img src="/codebase/images/console.png"/> '+obj.value+'<img src="/codebase/images/loading.gif" style="width:20px;height:20px" />';
+										},
 									},
 
 								],
@@ -73,6 +79,7 @@
 						// Main Panel
 						{
 							id:"main",
+							//minHeight:1000,
 							rows:[
 								// Text editor
 								{
@@ -98,6 +105,7 @@
 								{
 									id : "console",
 									css: "console",
+									autoheight:true,
 									hidden:false,
 									datathrottle:500,
 									url:"http://www.timeapi.org/utc/now",
@@ -113,12 +121,18 @@
 
 								// Deploy panel
 								{
-									view:"form", 
 									id:"deployform",
 									hidden:true,
-									elements:[],
-									icon:"/codebase/images/console.png",
-									template: function (obj) {return '<img src="'+obj.icon+'"/>'},
+									//autoheight:true,
+									height:"auto",
+									rows:[
+										{ id:"button_build", view:"button", value:"Build" , type:"form" },{id:"button_noop", view:"button", value:"NoOp" },
+										{
+											view:"form", 
+											id:"deployform-main",
+											elements:[],
+    									},
+    								]
     							}
 							]
 						},
@@ -157,10 +171,9 @@
 					],
 				});
 
-		
 
 
-				//->Events<-//
+			//->Events<-//
 
 
 			// Global Functions //
@@ -176,7 +189,7 @@
 				webix.ajax(obj.getItem(id).variables, function(text) {
 					//webix.message(text);
 					formlayout = JSON.parse(text);
-					formlayout.push({ margin:5, cols:[{ view:"button", value:"Build" , type:"form" },{ view:"button", value:"NoOp" }]});
+					//formlayout.push({ margin:5, cols:[{ id:"button_build", view:"button", value:"Build" , type:"form" },{id:"button_noop", view:"button", value:"NoOp" }]});
 					webix.ui(formlayout, $$('deployform'));
 				});
 			};
@@ -207,6 +220,17 @@
     				$$("console").hide();
     			};
 			});
+
+
+
+			// Build pane buttons
+			$$("button_build").attachEvent("onItemClick", function(){
+    			//webix.message(this.getItem(id).value);
+    			webix.message("Scheduling build");
+			});
+			
+
+
 
 
 
@@ -266,11 +290,20 @@
 
 
 			// Get builds
-			refreshBuildProg();
+			//refreshBuildProg();
 			
 
-			
-			
+			// Other
+
+
+			// Initial console
+			webix.message("Loading readme...");
+			webix.ajax("/api/readme", function(text) {
+				$$("console-main").define("value", text);
+				$$("console-main").refresh();
+			});
+
+
 
 
 		</script>
