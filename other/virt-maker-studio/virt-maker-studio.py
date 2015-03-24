@@ -216,13 +216,16 @@ class Builder:
 		filepath = filepath.lstrip('%s/'%(repo))
 		content = '/api/files/%s/content/%s'%(repo,filepath)
 		response = {
-				"repo":repo,
-				"filename":filepath.split('/')[-1],
-				"filepath":filepath,
-				"variables":variables,
-				"started":int(time.time()),
-				"content":content,
-				"stdout":"/api/builds/console/%s"%(id),
+					"id":id,
+					"repo":repo,
+					"value":filepath.split('/')[-1],
+					"filepath":filepath,
+					"variables":variables,
+					"started":int(time.time()),
+					"content":content,
+					"stdout":"/api/builds/console/%s"%(id),
+					"status":"/api/builds/status/%s"%(id),
+					#"image":"/codebase/images/console.png",
 				}
 		return(response)
 
@@ -231,6 +234,7 @@ class Builder:
 		command = cmd.split(' ')
 		proc = subprocess.Popen(command, stdout=subprocess.PIPE)
 		r.set(self.tag(id),'')
+		r.set(self.tag(id)+'_status','starting')
 		while proc.poll() is None:
 			output = proc.stdout.readline()
 			newval = '%s%s'%(r.get(self.tag(id)),output)
@@ -238,12 +242,17 @@ class Builder:
 				proc.kill()
 				newval = '<PROCESS KILLED %s>'%(str(int(time.time())))
 			r.set(self.tag(id),newval)
-			#r.expire(self.tag(id),900)
+			r.set(self.tag(id)+'_status','in progress')
+			r.expire(self.tag(id)+'_status',900)
+		r.set(self.tag(id)+'_status','done')
 
 	def console(self,id):
 		return(r.get(self.tag(id)))
 
-
+	def status(self,id):
+		status = r.get(self.tag(id)+'_status')
+		if status == None: status == 'unknown'
+		return(status)
 
 ##-> MAIN APP <-##
 app = Flask(__name__, static_url_path=htmldir)
@@ -416,6 +425,7 @@ def listBuilds():
 	files = Files()
 	builder = Builder()
 	html = json.dumps(json.loads(r.get(tag)),indent=2)
+	#html = '[{"value":"some-build"}]'
 	return(html)
 
 
@@ -452,6 +462,13 @@ def buildConsole(id):
 	if request.method == 'DELETE':
 		r.set('%s_kill'%(builder.tag(id)),'True')
 	return(builder.console(builder.tag(id)))
+
+
+
+@app.route('/api/builds/status/<id>', methods=['GET'])
+def buildStatus(id):
+	builder = Builder()
+	return(builder.status(builder.tag(id)))
 
 
 

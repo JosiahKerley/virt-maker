@@ -1,6 +1,7 @@
 Note:
 =====
 Be advised, this is still pretty early.  I'm still hammering out details with the DSL and provider modules (as well as things like whether or not I want to incorporate jinja2)
+Also been playing around with making a RESTful daemon for build automation.  Working on building a GUI around it for fun.
 
 
 About:

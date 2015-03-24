@@ -5,6 +5,13 @@
 		<link rel="stylesheet" href="codebase/webix.css" type="text/css" charset="utf-8">
 		<script src="codebase/webix.js" type="text/javascript" charset="utf-8"></script>
 		<link rel="stylesheet" type="text/css" href="codebase/filemanager/filemanager.css">
+		<style>
+    		.console textarea {
+        		background:#202020;
+        		color:white;
+        		font-family: "Courier New", Courier, monospace;
+    		}
+		</style>
 	</head>
 	<body>
 		<script type="text/javascript" charset="utf-8">
@@ -35,6 +42,7 @@
 										select : true,
 										clipboard : true,
 										url : "/api/repos",
+										datathrottle:500,
 										drag : true,
 										gravity : 0.3,
 										select : true,
@@ -47,8 +55,10 @@
 									},
 									{
     									view:"list",
+    									id:"buildstatus",
     									position:"bottom",
-										data:[]
+										//data:[],
+										url:'/api/builds',
 									},
 
 								],
@@ -67,6 +77,7 @@
 								// Text editor
 								{
 									id : "texteditor",
+									hidden:true,
 									rows:[
 										{
 											view:"toolbar",
@@ -83,12 +94,31 @@
 									],
 								},
 
+								// Console
+								{
+									id : "console",
+									css: "console",
+									hidden:false,
+									datathrottle:500,
+									url:"http://www.timeapi.org/utc/now",
+									rows:[
+										{
+											id : "console-main",
+											view : "textarea",
+											value : "",
+											readonly: true,
+										},
+									],
+								},
+
 								// Deploy panel
 								{
-    								view:"form", 
-    								id:"deployform",
-    								hidden:true,
-    								elements:[],
+									view:"form", 
+									id:"deployform",
+									hidden:true,
+									elements:[],
+									icon:"/codebase/images/console.png",
+									template: function (obj) {return '<img src="'+obj.icon+'"/>'},
     							}
 							]
 						},
@@ -134,6 +164,8 @@
 
 
 			// Global Functions //
+			
+			// Refresh file editor/builder
 			function refreshViews(obj, id){
 				var apifilepath = obj.getItem(id).content;
 				webix.ajax(obj.getItem(id).content, function(text) {
@@ -142,9 +174,19 @@
 					$$("texteditor-main").refresh();
 				});
 				webix.ajax(obj.getItem(id).variables, function(text) {
+					//webix.message(text);
 					formlayout = JSON.parse(text);
 					formlayout.push({ margin:5, cols:[{ view:"button", value:"Build" , type:"form" },{ view:"button", value:"NoOp" }]});
 					webix.ui(formlayout, $$('deployform'));
+				});
+			};
+
+			
+			// Refresh build progress
+			function refreshBuildProg(){
+				webix.ajax('/api/builds', function(text) {
+					buildlist = JSON.parse(text);
+					webix.ui(buildlist, $$('buildstatus'));
 				});
 			};
 
@@ -153,13 +195,32 @@
 			$$("filemenu").attachEvent("onItemClick", function(id){
     			webix.message(this.getItem(id).value);
     			if (this.getItem(id).value == "Open in Editor"){
+    				//webix.message("Opening editor");
     				$$("texteditor").show();
     				$$("deployform").hide();
+    				$$("console").hide();
     			};
     			if (this.getItem(id).value == "Open in Builder"){
+    				webix.message("Opening builder");
     				$$("texteditor").hide();
     				$$("deployform").show();
+    				$$("console").hide();
     			};
+			});
+
+
+
+			// Build queue actions
+			$$("buildstatus").attachEvent("onItemClick", function(id){
+    			//webix.message(this.getItem(id).stdout);
+    			webix.message("Opening console");
+    			$$("console").show();
+    			$$("texteditor").hide();
+    			$$("deployform").hide();
+				webix.ajax(this.getItem(id).stdout, function(text) {
+					$$("console-main").define("value", text);
+					$$("console-main").refresh();
+				});
 			});
 
 
@@ -203,6 +264,9 @@
 				});
 			});
 
+
+			// Get builds
+			refreshBuildProg();
 			
 
 			
