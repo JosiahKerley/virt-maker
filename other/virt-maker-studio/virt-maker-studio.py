@@ -67,7 +67,7 @@ def pathTree(path,name,id=0,dotfiles=False):
 		d['type'] = "file"
 		d['content'] = "/api/files/%s/content/%s"%(name.split('/')[-1],d['path'])
 		d['variables'] = "/api/files/%s/variables/%s"%(name.split('/')[-1],d['path'])
-		d['build'] = "/api/files/%s/builds/%s"%(name.split('/')[-1],d['path'])
+		d['build'] = "/api/builds/%s/%s"%(name.split('/')[-1],d['path'])
 	return(d)
 
 
@@ -464,11 +464,12 @@ def buildTemplate(path):
 	files = Files()
 	builder = Builder()
 	form = dict(request.form)
+	print json.dumps(form,indent=2)
 	flatform = {}
 	for i in form:
 		flatform[i] = form[i][0]
 	retval = builder.build(path,flatform)
-	print retval
+	print json.dumps(retval,indent=2)
 	if r.get(tag) == None:
 		newval = [retval]
 	else:
