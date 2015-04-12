@@ -374,3 +374,36 @@ ram=2048
 @slack <[SLACKCHANNEL]> <[SLACKKEY]>
 Build "<[HOSTNAME]>" Complete
 ```
+
+
+Bugs
+====
+* Blank variable header causes first step to skip
+* Per step hashsums can cause collisions
+
+
+Future Features
+===============
+* Change 'templates' to 'blueprints'
+* Change '@cache' to '@store'
+* Change per step hashsums to rolling hashsums
+* JSON blueprints
+* Snapshot only store
+* Storing JSON blueprints with stored snapshots (this would allow a "computed" lightweight link to a snapshot)
+* Arbitrary HTTP file uploads
+
+
+Other Thoughts
+==============
+* Tmpfs build workspace
+* Native Jinja2 incorporation
+* Glance integration
+
+
+
+
+
+
+
+
+
