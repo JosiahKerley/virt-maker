@@ -16,7 +16,7 @@ from distutils.spawn import find_executable
 settings = {
 	'verbose':True,
 	'varlib':'/var/lib/virt-maker',
-	'imgcache':'/var/lib/virt-maker/cache'
+	'imgcache':'/var/lib/virt-maker/store'
 }
 
 
@@ -225,17 +225,18 @@ def build(blueprint,noop=False):
 
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
-parser.add_argument('--file','-f',                action="store",      dest="vbpfilepath",    default=False, help='Blueprint file',                    nargs='*')
-parser.add_argument('--build','-b',               action="store_true", dest="build",          default=False, help='Build blueprint')
-parser.add_argument('--noop','-n',                action="store_true", dest="noop",           default=False, help='Displays provider output only')
-parser.add_argument('--list-store','--list','-l', action="store_true", dest="list",           default=False, help='List stored images')
-parser.add_argument('--variables','-v',           action="store",      dest='overridevars',   default=False, help='Override input variables on build', nargs='*')
-parser.add_argument('--show-variables','-s',      action="store_true", dest='show_variables', default=False, help='Shows the input variables for a given *.vbp file')
-parser.add_argument('--dump-blueprint','-d',      action="store_true", dest='show_blueprint', default=False, help='Shows the input blueprint for a given *.vbp file')
-#arser.add_argument('--output-format','-o',       action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
-parser.add_argument('--input-format','-i',        action="store",      dest='input_format',   default='KEY', help='Set the input format (JSON|Key).  Default KEY')
-parser.add_argument('--pretty','-p',              action="store_true", dest='pretty',         default=False, help='Displays output in easily readable format')
-parser.add_argument('--version',                  action='version',    version='%(prog)s 1.0')
+parser.add_argument('--file','-f',                    action="store",      dest="vbpfilepath",    default=False,  help='Blueprint file',                    nargs='*')
+parser.add_argument('--build','-b',                   action="store_true", dest="build",          default=False,  help='Build blueprint')
+parser.add_argument('--noop','-n',                    action="store_true", dest="noop",           default=False,  help='Displays provider output only')
+parser.add_argument('--list-store','--list','-l',     action="store_true", dest="list",           default=False,  help='List stored images')
+parser.add_argument('--list-providers','--providers', action="store_true", dest="providers",      default=False,  help='List providers')
+parser.add_argument('--variables','-v',               action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
+parser.add_argument('--show-variables','-s',          action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vbp file')
+parser.add_argument('--dump-blueprint','-d',          action="store_true", dest='show_blueprint', default=False,  help='Shows the input blueprint for a given *.vbp file')
+#arser.add_argument('--output-format','-o',           action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
+parser.add_argument('--input-format','-i',            action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
+parser.add_argument('--pretty','-p',                  action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
+parser.add_argument('--version',                      action='version',    version='%(prog)s 1.0')
 results = parser.parse_args()
 
 
@@ -265,6 +266,13 @@ if results.vbpfilepath:
 elif results.list:
 	#files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)] ## Maybe...
 	files = os.listdir(settings['imgcache'])
+	if results.pretty:
+		pass
+	else:
+		for i in files:
+			print i
+elif results.providers:
+	files = os.listdir('%s/providers'%(settings['varlib']))
 	if results.pretty:
 		pass
 	else:

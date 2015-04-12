@@ -385,13 +385,14 @@ Bugs
 Future Features
 ===============
 * Change 'templates' to 'blueprints'
-* Change '@cache' to '@store'
+* Change '@store' to '@store'
 * ~~Change per step hashsums to rolling hashsums~~ ...done
 * JSON blueprints
 * Snapshot only store
 * Per file sub-workspace
 * Storing JSON blueprints with stored snapshots (this would allow a "computed" lightweight link to a snapshot)
 * Arbitrary HTTP file uploads
+* CLI argument to list providers
 
 
 Other Thoughts
