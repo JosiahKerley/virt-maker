@@ -13,11 +13,7 @@ This is tool that allows you to write a fairly simple template (or script if you
 Command Line:
 =============
 ```
-usage: virt-maker [-h] [--file [VBPFILEPATH [VBPFILEPATH ...]]] [--build]
-                  [--noop] [--list-store]
-                  [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]]
-                  [--show-variables] [--show-blueprint]
-                  [--input-format INPUT_FORMAT] [--pretty] [--version]
+usage: virt-maker [-h] [--file [VBPFILEPATH [VBPFILEPATH ...]]] [--build] [--noop] [--list-store] [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]] [--show-variables] [--dump-blueprint] [--input-format INPUT_FORMAT] [--pretty] [--version]
 
 Libvirt based VM builder
 
@@ -29,15 +25,14 @@ optional arguments:
   --noop, -n            Displays provider output only
   --list-store, --list, -l
                         List stored images
-  --variables [OVERRIDEVARS [OVERRIDEVARS ...]]
+  --variables [OVERRIDEVARS [OVERRIDEVARS ...]], -v [OVERRIDEVARS [OVERRIDEVARS ...]]
                         Override input variables on build
-  --show-variables      Shows the input variables for a given *.vbp file
-  --show-blueprint      Shows the input blueprint for a given *.vbp file
-  --input-format INPUT_FORMAT
+  --show-variables, -s  Shows the input variables for a given *.vbp file
+  --dump-blueprint, -d  Shows the input blueprint for a given *.vbp file
+  --input-format INPUT_FORMAT, -i INPUT_FORMAT
                         Set the input format (JSON|Key). Default KEY
   --pretty, -p          Displays output in easily readable format
   --version             show program's version number and exit
-
 ```
 
 
