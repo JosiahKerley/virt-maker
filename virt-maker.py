@@ -215,6 +215,7 @@ def build(blueprint,noop=False,nocache=True):
 					if not noop: image.snapshot(section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
 		if not noop: lasthash = section['hash']
+		print 'end'
 
 	## Finish
 	os.chdir(cwd)
