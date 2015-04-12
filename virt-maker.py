@@ -119,10 +119,6 @@ class Image:
 		cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1'%(imagefile,link)
 		if not os.system(cmd) == 0: os.remove(link)
 
-	def chainlink(self,link):
-		self.chain.append(link)
-		with open(self.buildchain,'w') as f: f.write(pickle.dumps(self.chain))
-
 	def mount(self,link):
 		try:
 			imagefile = self.chain[-1]
@@ -151,7 +147,7 @@ class Image:
 
 
 ## Build VBP file
-def build(blueprint,noop=False):
+def build(blueprint,noop=False,cache=True):
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
@@ -160,7 +156,6 @@ def build(blueprint,noop=False):
 	image = Image()
 	cwd = os.getcwd()
 	chain = []
-	cache = True
 	steps = 0
 	lasthash = None
 
@@ -169,9 +164,6 @@ def build(blueprint,noop=False):
 		os.makedirs(workingdir)
 	os.chdir(workingdir)
 	image.setup()
-	#chain = json.loads(json.dumps(image.chain))
-	#chain.reverse()
-	#link = chain.pop()
 	providerdir = '%s/providers'%(settings['varlib'])
 
 	## Execute sections
@@ -181,15 +173,12 @@ def build(blueprint,noop=False):
 
 		## Handles the providers
 		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
-		#try: link = chain.pop()
-		#except: link = None
-		#if link == section['hash'] and cache:
 		if os.path.isfile(section['hash']) and cache:
 			pass
 		else:
 			cache = False
 			if not os.path.isfile(providerscript):
-				if not find_executable(section['provider']) == None:	## Handles arbitrary commands
+				if not find_executable(section['provider']) == None:  ## Handles arbitrary commands
 					if settings['verbose']:
 						cmd = '%s %s'%(section['provider'],section['argument'])
 						print(cmd)
@@ -237,6 +226,7 @@ parser.add_argument('--dump-blueprint','-d',          action="store_true", dest=
 #arser.add_argument('--output-format','-o',           action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
 parser.add_argument('--input-format','-i',            action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
 parser.add_argument('--pretty','-p',                  action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
+parser.add_argument('--no-delta','-d',                action="store_true", dest='nodelta',        default=False,  help='Build blueprint without using deltas')
 parser.add_argument('--version',                      action='version',    version='%(prog)s 1.0')
 results = parser.parse_args()
 
@@ -263,7 +253,7 @@ if results.vbpfilepath:
 				print(json.dumps(blueprint,indent=2))
 			else:
 				print(json.dumps(blueprint))
-		if results.build: build(blueprint,results.noop)
+		if results.build: build(blueprint,results.noop,results.nodelta)
 elif results.list:
 	#files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)] ## Maybe...
 	files = os.listdir(settings['imgcache'])
