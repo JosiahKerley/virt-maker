@@ -59,18 +59,19 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	for s in sectionsraw:
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
-		sections.append(
-			{
-				"provider":head.split(' ')[0],
-				"argument":head.replace('%s '%(head.split(' ')[0]),''),
-				"body":body.split('\n#%s'%(providerchar))[0],
-			}
-		)
-		if sections[-1]['provider'] == '':
-			sections[-1]['provider'] = lastprovider
-		lastprovider = sections[-1]['provider']
-		sections[-1]['hash'] = hashlib.md5(lasthash+json.dumps(sections[-1])).hexdigest()
-		lasthash = sections[-1]['hash']
+		if not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
+			sections.append(
+				{
+					"provider":head.split(' ')[0],
+					"argument":head.replace('%s '%(head.split(' ')[0]),''),
+					"body":body.split('\n#%s'%(providerchar))[0],
+				}
+			)
+			if sections[-1]['provider'] == '':
+				sections[-1]['provider'] = lastprovider
+			lastprovider = sections[-1]['provider']
+			sections[-1]['hash'] = hashlib.md5(lasthash+json.dumps(sections[-1])).hexdigest()
+			lasthash = sections[-1]['hash']
 	return(sections)
 
 
