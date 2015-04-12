@@ -148,6 +148,7 @@ class Image:
 
 ## Build VBP file
 def build(blueprint,noop=False,cache=True):
+	print cache
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
