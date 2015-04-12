@@ -18,7 +18,16 @@ def provider(body,hash,args,verbose,image,settings):
 	cmdargs = ' '
 	for i in defaults:
 		cmdargs += ' --%s %s'%(i,defaults[i])
-	cmdargs = cmdargs.replace('<[args]>',os.path.abspath(args))
+	
+	if not os.path.isfile(args):
+		storefile = '%s/%s'%(settings['imgcache'],args)
+		storefile = storefile.replace('//','/')
+		if os.path.isfile(storefile):
+			args = storefile
+		else:
+			return('No image file found.')
+	imgfile = os.path.abspath(args)
+	cmdargs = cmdargs.replace('<[args]>',imgfile)
 	if verbose:
 		cmd = 'virt-install --autostart %s --import --force'%(cmdargs)
 		print cmd
