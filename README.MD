@@ -378,15 +378,15 @@ Build "<[HOSTNAME]>" Complete
 
 Bugs
 ====
-* Blank variable header causes first step to skip
-* Per step hashsums can cause collisions
+* ~~Blank variable header causes first step to skip~~ ...done
+* ~~Per step hashsums can cause collisions~~ ...done
 
 
 Future Features
 ===============
 * Change 'templates' to 'blueprints'
 * Change '@cache' to '@store'
-* Change per step hashsums to rolling hashsums
+* ~~Change per step hashsums to rolling hashsums~~ ...done
 * JSON blueprints
 * Snapshot only store
 * Per file sub-workspace
