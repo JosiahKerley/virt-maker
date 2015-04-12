@@ -10,11 +10,14 @@ defaults = {
 }
 import os
 def provider(body,hash,args,verbose,image,settings):
+	name = args.split('/')[-1]
+	name = name.replace(' ','_')
 	for line in body.split('\n'):
 		if '=' in line:
 			left = line.split('=')[0]
 			right = '='.join(line.split('=')[1:])
 			defaults[left] = right
+	if not 'name' in defaults: defaults['name'] = name
 	cmdargs = ' '
 	for i in defaults:
 		cmdargs += ' --%s %s'%(i,defaults[i])
