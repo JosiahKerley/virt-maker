@@ -186,6 +186,7 @@ def build(blueprint,noop=False,nocache=True):
 			else:
 				print 'top'
 				os.system('pwd')
+				os.system('ls')
 				mounted = False
 				os.chdir(workingdir)
 				try:
@@ -197,6 +198,7 @@ def build(blueprint,noop=False,nocache=True):
 				retval = 0
 				print 'bottom'
 				os.system('pwd')
+				os.system('ls')
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
