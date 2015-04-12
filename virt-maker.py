@@ -55,6 +55,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
 	lasthash = 'start'
+	lastprovider = None
 	for s in sectionsraw:
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
@@ -67,6 +68,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 			}
 		)
 		lasthash = sections[-1]['hash']
+		lasthash = sections[-1]['provider']
 	sections.remove(sections[0]) ## Remove blank entry
 	return(sections)
 
@@ -148,7 +150,7 @@ class Image:
 
 
 ## Build VMK file
-def build(template,noop=False):
+def build(blueprint,noop=False):
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
@@ -172,7 +174,7 @@ def build(template,noop=False):
 	providerdir = '%s/providers'%(settings['varlib'])
 
 	## Execute sections
-	for section in template:
+	for section in blueprint:
 		steps += 1
 		providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
@@ -222,16 +224,17 @@ def build(template,noop=False):
 
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
-parser.add_argument('--file','-f',      action="store",      dest="vmkfilepath",    default=False,  help='VMK build template file',           nargs='*')
-parser.add_argument('--build','-b',     action="store_true", dest="build",          default=False,  help='Build file')
-parser.add_argument('--noop','-n',      action="store_true", dest="noop",           default=False,  help='Displays provider output only')
-parser.add_argument('--variables',      action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
-parser.add_argument('--show-variables', action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vmk file')
-parser.add_argument('--show-template',  action="store_true", dest='show_template',  default=False,  help='Shows the input template for a given *.vmk file')
-#arser.add_argument('--output-format',  action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
-parser.add_argument('--input-format',   action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
-parser.add_argument('--pretty','-p',    action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
-parser.add_argument('--version',        action='version',    version='%(prog)s 1.0')
+parser.add_argument('--file','-f',                action="store",      dest="vmkfilepath",    default=False,  help='VMK build blueprint file',          nargs='*')
+parser.add_argument('--build','-b',               action="store_true", dest="build",          default=False,  help='Build file')
+parser.add_argument('--noop','-n',                action="store_true", dest="noop",           default=False,  help='Displays provider output only')
+parser.add_argument('--list-store','--list','-l', action="store_true", dest="list",           default=False,  help='List stored images')
+parser.add_argument('--variables',                action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
+parser.add_argument('--show-variables',           action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vmk file')
+parser.add_argument('--show-blueprint',           action="store_true", dest='show_blueprint',  default=False, help='Shows the input blueprint for a given *.vmk file')
+#arser.add_argument('--output-format',            action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
+parser.add_argument('--input-format',             action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
+parser.add_argument('--pretty','-p',              action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
+parser.add_argument('--version',                  action='version',    version='%(prog)s 1.0')
 results = parser.parse_args()
 
 
@@ -240,24 +243,30 @@ if results.vmkfilepath:
 	for vmk in results.vmkfilepath:
 		with open(vmk,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
+		if results.list:
+			if results.pretty:
+				pass
+			else:
+				for i in os.dir(settings['imgcache']):
+					print i
 		if results.overridevars:
 			for i in results.overridevars:
 				if results.input_format.lower() == 'key':
 					options = dict(options.items()+dsl2opt(i).items())
 				elif results.input_format.lower() == 'json':
 					options = dict(options.items()+json.loads(i).items())
-		template = dsl2dict(filetext,options)
+		blueprint = dsl2dict(filetext,options)
 		if results.show_variables:
 			if results.pretty:
 				print(json.dumps(options,indent=2))
 			else:
 				print(json.dumps(options))
-		if results.show_template:
+		if results.show_blueprint:
 			if results.pretty:
-				print(json.dumps(template,indent=2))
+				print(json.dumps(blueprint,indent=2))
 			else:
-				print(json.dumps(template))
-		if results.build: build(template,results.noop)
+				print(json.dumps(blueprint))
+		if results.build: build(blueprint,results.noop)
 else:
 	raise('No input file specified')
 	sys.exit(1)

@@ -400,7 +400,7 @@ Other Thoughts
 * Tmpfs build workspace
 * Native Jinja2 incorporation
 * Glance integration
-
+* Generate equivalent bash script that performs build
 
 
 
