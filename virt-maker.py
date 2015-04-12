@@ -46,6 +46,7 @@ def dsl2opt(text,providerchar='@'):
 
 ## Parses DSL Statements
 def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
+	print text
 	text = text.replace('\n%s'%(providerchar),'\n\n%s'%(providerchar))
 	text = providerchar.join(text.split(providerchar)[1:])
 	if options:
@@ -54,7 +55,6 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 			val = options[i]
 			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
-	print json.dumps(sectionsraw,indent=2)
 	sections = []
 	lasthash = 'start'
 	lastprovider = None
