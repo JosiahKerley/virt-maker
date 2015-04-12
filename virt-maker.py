@@ -200,6 +200,7 @@ def build(blueprint,noop=False,nocache=True):
 					print('ERROR!')
 					sys.exit(1)
 				try:
+					os.system('ls')
 					if not noop: image.snapshot(section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
 		if not noop: lasthash = section['hash']
