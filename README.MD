@@ -13,7 +13,7 @@ This is tool that allows you to write a fairly simple template (or script if you
 Command Line:
 =============
 ```
-usage: virt-maker [-h] [--file [VMKFILEPATH [VMKFILEPATH ...]]] [--build]
+usage: virt-maker [-h] [--file [VBPFILEPATH [VBPFILEPATH ...]]] [--build]
                   [--noop] [--list-store]
                   [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]]
                   [--show-variables] [--show-blueprint]
@@ -23,16 +23,16 @@ Libvirt based VM builder
 
 optional arguments:
   -h, --help            show this help message and exit
-  --file [VMKFILEPATH [VMKFILEPATH ...]], -f [VMKFILEPATH [VMKFILEPATH ...]]
-                        VMK build blueprint file
+  --file [VBPFILEPATH [VBPFILEPATH ...]], -f [VBPFILEPATH [VBPFILEPATH ...]]
+                        VBP build blueprint file
   --build, -b           Build file
   --noop, -n            Displays provider output only
   --list-store, --list, -l
                         List stored images
   --variables [OVERRIDEVARS [OVERRIDEVARS ...]]
                         Override input variables on build
-  --show-variables      Shows the input variables for a given *.vmk file
-  --show-blueprint      Shows the input blueprint for a given *.vmk file
+  --show-variables      Shows the input variables for a given *.vbp file
+  --show-blueprint      Shows the input blueprint for a given *.vbp file
   --input-format INPUT_FORMAT
                         Set the input format (JSON|Key). Default KEY
   --pretty, -p          Displays output in easily readable format
@@ -162,11 +162,11 @@ Examples:
 Create an nginx proxied rundeck server an deploy it with a macvtap
 
 ```
-##                         Build: virt-maker --build --file rundeck.vmk
-##           Show variables used: virt-maker --file rundeck.vmk --show-variables --pretty
-## Build with override variables: virt-maker --build --file rundeck.vmk --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
+##                         Build: virt-maker --build --file rundeck.vbp
+##           Show variables used: virt-maker --file rundeck.vbp --show-variables --pretty
+## Build with override variables: virt-maker --build --file rundeck.vbp --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 
 ##
-##    VMK File contents:
+##    VBP File contents:
 ##
 ##
 

@@ -149,13 +149,13 @@ class Image:
 
 
 
-## Build VMK file
+## Build VBP file
 def build(blueprint,noop=False):
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
-	vmkdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
-	workingdir = (vmkdir+'/.virt-maker')
+	vbpdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\','/')
+	workingdir = (vbpdir+'/.virt-maker')
 	image = Image()
 	cwd = os.getcwd()
 	chain = []
@@ -224,13 +224,13 @@ def build(blueprint,noop=False):
 
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
-parser.add_argument('--file','-f',                action="store",      dest="vmkfilepath",    default=False,  help='VMK build blueprint file',          nargs='*')
+parser.add_argument('--file','-f',                action="store",      dest="vbpfilepath",    default=False,  help='VBP build blueprint file',          nargs='*')
 parser.add_argument('--build','-b',               action="store_true", dest="build",          default=False,  help='Build file')
 parser.add_argument('--noop','-n',                action="store_true", dest="noop",           default=False,  help='Displays provider output only')
 parser.add_argument('--list-store','--list','-l', action="store_true", dest="list",           default=False,  help='List stored images')
 parser.add_argument('--variables',                action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
-parser.add_argument('--show-variables',           action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vmk file')
-parser.add_argument('--show-blueprint',           action="store_true", dest='show_blueprint',  default=False, help='Shows the input blueprint for a given *.vmk file')
+parser.add_argument('--show-variables',           action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vbp file')
+parser.add_argument('--show-blueprint',           action="store_true", dest='show_blueprint',  default=False, help='Shows the input blueprint for a given *.vbp file')
 #arser.add_argument('--output-format',            action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
 parser.add_argument('--input-format',             action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
 parser.add_argument('--pretty','-p',              action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
@@ -239,9 +239,9 @@ results = parser.parse_args()
 
 
 ## Execute
-if results.vmkfilepath:
-	for vmk in results.vmkfilepath:
-		with open(vmk,'r') as f: filetext = f.read()
+if results.vbpfilepath:
+	for vbp in results.vbpfilepath:
+		with open(vbp,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
 		if results.overridevars:
 			for i in results.overridevars:
@@ -274,12 +274,12 @@ else:
 	sys.exit(1)
 
 '''
-## Get vmk contents
+## Get vbp contents
 try:
 	
 	build(filetext)
 except:
-	print('Cannot open *.vmk file')
+	print('Cannot open *.vbp file')
 	sys.exit(False)
 '''
 
