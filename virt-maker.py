@@ -239,13 +239,6 @@ results = parser.parse_args()
 
 
 ## Execute
-if results.list:
-	files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
-	if results.pretty:
-		pass
-	else:
-		for i in files:
-			print i
 if results.vmkfilepath:
 	for vmk in results.vmkfilepath:
 		with open(vmk,'r') as f: filetext = f.read()
@@ -268,6 +261,13 @@ if results.vmkfilepath:
 			else:
 				print(json.dumps(blueprint))
 		if results.build: build(blueprint,results.noop)
+elif results.list:
+	files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
+	if results.pretty:
+		pass
+	else:
+		for i in files:
+			print i
 else:
 	raise('No input file specified')
 	sys.exit(1)
