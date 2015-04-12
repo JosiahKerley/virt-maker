@@ -148,7 +148,6 @@ class Image:
 
 ## Build VBP file
 def build(blueprint,noop=False,nocache=True):
-	print nocache
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
@@ -177,7 +176,6 @@ def build(blueprint,noop=False,nocache=True):
 		if os.path.isfile(section['hash']) and not nocache:
 			pass
 		else:
-			cache = False
 			if not os.path.isfile(providerscript):
 				if not find_executable(section['provider']) == None:  ## Handles arbitrary commands
 					if settings['verbose']:
