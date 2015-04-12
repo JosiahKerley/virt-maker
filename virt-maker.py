@@ -186,7 +186,8 @@ def build(blueprint,noop=False,nocache=True):
 					print retval
 					print('ERROR!')
 					sys.exit(1)
-				image.snapshot(lasthash,section['hash'])
+				try: image.snapshot(lasthash,section['hash'])
+				except: print '!!!'
 		if not noop: lasthash = section['hash']
 		print 'end'
 
