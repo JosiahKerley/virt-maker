@@ -99,7 +99,6 @@ def fetch(url,dest):
 class Image:
 	backingimage = False
 	lastimg = False
-	chain = [None]
 	buildchain = 'buildchain'
 
 	def setup(self):
@@ -120,10 +119,7 @@ class Image:
 		if not os.system(cmd) == 0: os.remove(link)
 
 	def mount(self,link):
-		try:
-			imagefile = self.chain[-1]
-		except:
-			imagefile = self.backingimage
+		imagefile = link
 		mountdir = '%s_mount'%(imagefile)
 		if not os.path.isdir(mountdir): os.makedirs(mountdir)
 		cmd = 'guestmount -a %s -m /dev/sda1 --rw %s/ >/dev/null 2>&1'%(imagefile,mountdir)
@@ -131,11 +127,8 @@ class Image:
 		os.chdir(mountdir)
 
 	def unmount(self,link):
-		os.chdir('..')
-		try:
-			imagefile = self.chain[-1]
-		except:
-			imagefile = self.backingimage
+		os.chdir(workingdir)
+		imagefile = link
 		mountdir = '%s_mount'%(imagefile)
 		## unmount command
 		cmd = 'guestunmount %s/'%(mountdir)
@@ -192,7 +185,7 @@ def build(blueprint,noop=False,nocache=True):
 					exit(1)
 			else:
 				print 'top'
-				os.system('ls')
+				os.system('pwd')
 				mounted = False
 				os.chdir(workingdir)
 				try:
@@ -203,7 +196,7 @@ def build(blueprint,noop=False,nocache=True):
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
 				print 'bottom'
-				os.system('ls')
+				os.system('pwd')
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
