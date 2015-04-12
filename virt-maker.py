@@ -198,7 +198,7 @@ def build(blueprint,noop=False,nocache=True):
 					image.mount(lasthash)
 					mounted = True
 				except:
-					pass
+					print 'cannot mount'
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
 				print '\n\nbottom'
