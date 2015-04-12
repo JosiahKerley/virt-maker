@@ -58,9 +58,9 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	lasthash = 'start'
 	lastprovider = None
 	for s in sectionsraw:
-		l = s
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
+		body=s
 		#if not s.startswith('#') and not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
 		if not s.startswith('#'):
 			sections.append(
@@ -75,7 +75,6 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 			lastprovider = sections[-1]['provider']
 			sections[-1]['hash'] = hashlib.md5(lasthash+json.dumps(sections[-1])).hexdigest()
 			lasthash = sections[-1]['hash']
-	print l
 	return(sections)
 
 
