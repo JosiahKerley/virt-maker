@@ -163,7 +163,6 @@ def build(blueprint,noop=False,nocache=True):
 	if not os.path.isdir(workingdir):
 		os.makedirs(workingdir)
 	os.chdir(workingdir)
-	image.setup()
 	providerdir = '%s/providers'%(settings['varlib'])
 
 	## Execute sections
@@ -192,8 +191,10 @@ def build(blueprint,noop=False,nocache=True):
 					print 'Cannot find provider script "%s"'%(providerscript)
 					exit(1)
 			else:
+				print 'top'
 				os.system('ls')
 				mounted = False
+				os.chdir(workingdir)
 				try:
 					image.mount(lasthash)
 					mounted = True
@@ -201,6 +202,7 @@ def build(blueprint,noop=False,nocache=True):
 					pass
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
+				print 'bottom'
 				os.system('ls')
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
@@ -208,6 +210,7 @@ def build(blueprint,noop=False,nocache=True):
 					print('ERROR!')
 					sys.exit(1)
 				if mounted: image.unmount(lasthash)
+				os.chdir(workingdir)
 				try:
 					if not noop: image.snapshot(section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
