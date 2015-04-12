@@ -239,17 +239,17 @@ results = parser.parse_args()
 
 
 ## Execute
+if results.list:
+	files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
+	if results.pretty:
+		pass
+	else:
+		for i in files:
+			print i
 if results.vmkfilepath:
 	for vmk in results.vmkfilepath:
 		with open(vmk,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
-		if results.list:
-			files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
-			if results.pretty:
-				pass
-			else:
-				for i in files:
-					print i
 		if results.overridevars:
 			for i in results.overridevars:
 				if results.input_format.lower() == 'key':
