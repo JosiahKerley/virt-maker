@@ -244,10 +244,11 @@ if results.vmkfilepath:
 		with open(vmk,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
 		if results.list:
+			files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
 			if results.pretty:
 				pass
 			else:
-				for i in os.dir(settings['imgcache']):
+				for i in files:
 					print i
 		if results.overridevars:
 			for i in results.overridevars:
