@@ -48,7 +48,6 @@ def dsl2opt(text,providerchar='@'):
 def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	text = text.replace('\n%s'%(providerchar),'\n\n%s'%(providerchar))
 	text = providerchar.join(text.split('\n'+providerchar)[1:])
-	print text
 	if options:
 		for i in options:
 			key = mutatestr%(i.split('=')[0])
@@ -61,7 +60,6 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	for s in sectionsraw:
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
-		#if not s.startswith('#') and not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
 		if not s.startswith('#'):
 			sections.append(
 				{
