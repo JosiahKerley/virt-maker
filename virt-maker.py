@@ -108,15 +108,9 @@ class Image:
 			except:
 				os.remove(self.buildchain)
 
-	def snapshot(self,link):
-		try:
-			imagefile = self.chain[-1]
-		except:
-			imagefile = self.backingimage
-		## snapshot command here
-		with open(link,'w') as f: f.write('')
-		cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1'%(imagefile,link)
-		if not os.system(cmd) == 0: os.remove(link)
+	def snapshot(self,last,next):
+		cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1'%(last,next)
+		if not os.system(cmd) == 0: os.remove(next)
 
 	def mount(self,link):
 		imagefile = link
@@ -212,7 +206,7 @@ def build(blueprint,noop=False,nocache=True):
 				#if mounted: image.unmount(lasthash)
 				os.chdir(workingdir)
 				try:
-					if not noop: image.snapshot(section['hash'])
+					if not noop: image.snapshot(lasthash,section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
 		if not noop: lasthash = section['hash']
 		print 'end'
