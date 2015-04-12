@@ -203,7 +203,6 @@ def build(blueprint,noop=False,cache=True):
 				try:
 					if not noop: image.snapshot(section['hash'])
 				except: print("\tProvider '%s' does not use snapshots."%(section['provider']))
-		if not noop: image.chainlink(section['hash'])
 		if not noop: lasthash = section['hash']
 
 	## Finish
