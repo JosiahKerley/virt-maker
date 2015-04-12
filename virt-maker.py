@@ -194,11 +194,11 @@ def build(blueprint,noop=False,nocache=True):
 				os.system('ls')
 				mounted = False
 				os.chdir(workingdir)
-				try:
-					image.mount(lasthash)
-					mounted = True
-				except:
-					print 'cannot mount'
+				#try:
+				#	image.mount(lasthash)
+				#	mounted = True
+				#except:
+				#	print 'cannot mount'
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
 				print '\n\nbottom'
@@ -209,7 +209,7 @@ def build(blueprint,noop=False,nocache=True):
 					print retval
 					print('ERROR!')
 					sys.exit(1)
-				if mounted: image.unmount(lasthash)
+				#if mounted: image.unmount(lasthash)
 				os.chdir(workingdir)
 				try:
 					if not noop: image.snapshot(section['hash'])
