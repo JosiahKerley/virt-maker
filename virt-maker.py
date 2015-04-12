@@ -62,7 +62,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
 		#if not s.startswith('#') and not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
-		if True:
+		if not s.startswith('#'):
 			sections.append(
 				{
 					"provider":head.split(' ')[0],
