@@ -65,7 +65,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 		print s
 		with open('/tmp/vm.log','a') as f: f.write(body)
 		#if not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
-		if True:
+		if not s.startswith('#'):
 			sections.append(
 				{
 					"provider":head.split(' ')[0],
