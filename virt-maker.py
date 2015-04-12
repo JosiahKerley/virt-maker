@@ -54,13 +54,13 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 			val = options[i]
 			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
+	print json.dumps(sectionsraw,indent=2)
 	sections = []
 	lasthash = 'start'
 	lastprovider = None
 	for s in sectionsraw:
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
-		body=s
 		#if not s.startswith('#') and not (body.split('\n#%s'%(providerchar))[0]).startswith('#@'):
 		if not s.startswith('#'):
 			sections.append(
