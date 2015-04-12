@@ -389,6 +389,7 @@ Future Features
 * Change per step hashsums to rolling hashsums
 * JSON blueprints
 * Snapshot only store
+* Per file sub-workspace
 * Storing JSON blueprints with stored snapshots (this would allow a "computed" lightweight link to a snapshot)
 * Arbitrary HTTP file uploads
 
