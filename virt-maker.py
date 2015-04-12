@@ -53,6 +53,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 			text = text.replace(key,val)
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
+	lasthash = 'start'
 	for s in sectionsraw:
 		head = s.split('\n')[0]
 		body = ('\n'.join(s.split('\n')[1:-1])).replace('\\%s'%(providerchar),'%s'%(providerchar))
@@ -61,9 +62,10 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 				"provider":head.split(' ')[0],
 				"argument":head.replace('%s '%(head.split(' ')[0]),''),
 				"body":body.split('\n#%s'%(providerchar))[0],
-				"hash":(hashlib.md5(s)).hexdigest(),
+				"hash":(hashlib.md5(lasthash+s)).hexdigest(),
 			}
 		)
+		lasthash = sections[-1]['hash']
 	sections.remove(sections[0]) ## Remove blank entry
 	return(sections)
 
