@@ -46,6 +46,7 @@ def dsl2opt(text,providerchar='@'):
 
 ## Parses DSL Statements
 def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
+	text = '\n\n'+text
 	text = text.replace('\n%s'%(providerchar),'\n\n%s'%(providerchar))
 	text = providerchar.join(text.split('\n'+providerchar)[1:])
 	if options:
