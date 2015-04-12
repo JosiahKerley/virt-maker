@@ -192,6 +192,7 @@ def build(blueprint,noop=False,nocache=True):
 					print 'Cannot find provider script "%s"'%(providerscript)
 					exit(1)
 			else:
+				os.system('ls')
 				mounted = False
 				try:
 					image.mount(lasthash)
@@ -200,6 +201,7 @@ def build(blueprint,noop=False,nocache=True):
 					pass
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
+				os.system('ls')
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
 				if not retval == 0:
 					print retval
