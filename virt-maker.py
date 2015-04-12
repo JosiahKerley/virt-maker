@@ -160,6 +160,11 @@ def build(blueprint,noop=False,nocache=True):
 
 	## Execute sections
 	for section in blueprint:
+
+		print '\n\ntop'
+		os.system('pwd')
+		os.system('ls')
+
 		steps += 1
 		providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
@@ -184,7 +189,7 @@ def build(blueprint,noop=False,nocache=True):
 					print 'Cannot find provider script "%s"'%(providerscript)
 					exit(1)
 			else:
-				print 'top'
+				print '\n\nmiddle'
 				os.system('pwd')
 				os.system('ls')
 				mounted = False
@@ -196,7 +201,7 @@ def build(blueprint,noop=False,nocache=True):
 					pass
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
-				print 'bottom'
+				print '\n\nbottom'
 				os.system('pwd')
 				os.system('ls')
 				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
