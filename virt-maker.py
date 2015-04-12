@@ -48,10 +48,13 @@ def dsl2opt(text,providerchar='@'):
 def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 	text = '\n'+text.replace('\n@','\n\n@')
 	if options:
+		text = dsl2opt(text)
+		'''
 		for i in options:
 			key = mutatestr%(i.split('=')[0])
 			val = options[i]
 			text = text.replace(key,val)
+		'''
 	sectionsraw = text.split('\n%s'%(providerchar))
 	sections = []
 	lasthash = 'start'
