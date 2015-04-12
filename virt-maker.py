@@ -226,7 +226,7 @@ parser.add_argument('--dump-blueprint','-d',          action="store_true", dest=
 #arser.add_argument('--output-format','-o',           action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
 parser.add_argument('--input-format','-i',            action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
 parser.add_argument('--pretty','-p',                  action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
-parser.add_argument('--no-delta','-d',                action="store_true", dest='nodelta',        default=False,  help='Build blueprint without using deltas')
+parser.add_argument('--no-delta',                     action="store_true", dest='nodelta',        default=False,  help='Build blueprint without using deltas')
 parser.add_argument('--version',                      action='version',    version='%(prog)s 1.0')
 results = parser.parse_args()
 
