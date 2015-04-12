@@ -380,6 +380,7 @@ Bugs
 ====
 * ~~Blank variable header causes first step to skip~~ ...done
 * ~~Per step hashsums can cause collisions~~ ...done
+* ~~Step body not picking up if there is no newline before the next step provider~~ ...done
 
 
 Future Features
