@@ -169,9 +169,9 @@ def build(blueprint,noop=False):
 		os.makedirs(workingdir)
 	os.chdir(workingdir)
 	image.setup()
-	chain = json.loads(json.dumps(image.chain))
-	chain.reverse()
-	link = chain.pop()
+	#chain = json.loads(json.dumps(image.chain))
+	#chain.reverse()
+	#link = chain.pop()
 	providerdir = '%s/providers'%(settings['varlib'])
 
 	## Execute sections
@@ -181,9 +181,10 @@ def build(blueprint,noop=False):
 
 		## Handles the providers
 		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
-		try: link = chain.pop()
-		except: link = None
-		if link == section['hash'] and cache:
+		#try: link = chain.pop()
+		#except: link = None
+		#if link == section['hash'] and cache:
+		if os.path.isfile(section['hash']) and cache:
 			pass
 		else:
 			cache = False
