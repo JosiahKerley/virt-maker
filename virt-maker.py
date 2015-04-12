@@ -187,9 +187,8 @@ def build(blueprint,noop=False,nocache=True):
 					print('ERROR!')
 					sys.exit(1)
 				try: image.snapshot(lasthash,section['hash'])
-				except: print '!!!'
+				except: pass
 		if not noop: lasthash = section['hash']
-		print 'end'
 
 	## Finish
 	os.chdir(cwd)
