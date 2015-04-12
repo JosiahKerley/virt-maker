@@ -31,6 +31,8 @@ def provider(body,hash,args,verbose,image,settings):
 			return('No image file found.')
 	imgfile = os.path.abspath(args)
 	cmdargs = cmdargs.replace('<[args]>',imgfile)
+	os.system('virsh destroy %s'%(defaults['name']))
+	os.system('virsh undefine %s'%(defaults['name']))
 	if verbose:
 		cmd = 'virt-install --autostart %s --import --force'%(cmdargs)
 		print cmd
