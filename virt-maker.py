@@ -127,7 +127,7 @@ class Image:
 		os.chdir(mountdir)
 
 	def unmount(self,link):
-		os.chdir(workingdir)
+		os.chdir('..')
 		imagefile = link
 		mountdir = '%s_mount'%(imagefile)
 		## unmount command
