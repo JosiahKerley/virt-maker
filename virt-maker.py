@@ -74,7 +74,7 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 		print json.dumps(sections[-1])
 		sections[-1]['hash'] = hashlib.md5(lasthash+json.dumps(sections[-1])).hexdigest()
 		lasthash = sections[-1]['hash']
-	sections.remove(sections[0]) ## Remove blank entry
+	#sections.remove(sections[0]) ## Remove blank entry
 	return(sections)
 
 
