@@ -262,7 +262,8 @@ if results.vmkfilepath:
 				print(json.dumps(blueprint))
 		if results.build: build(blueprint,results.noop)
 elif results.list:
-	files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)]
+	#files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)] ## Maybe...
+	files = os.listdir(settings['imgcache'])
 	if results.pretty:
 		pass
 	else:
