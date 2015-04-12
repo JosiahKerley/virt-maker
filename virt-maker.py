@@ -64,9 +64,9 @@ def dsl2dict(text,options=False,mutatestr='<[%s]>', providerchar='@'):
 				"provider":head.split(' ')[0],
 				"argument":head.replace('%s '%(head.split(' ')[0]),''),
 				"body":body.split('\n#%s'%(providerchar))[0],
-				"hash":(hashlib.md5(lasthash+s)).hexdigest(),
 			}
 		)
+		sections[-1]['hash'] = hashlib.md5(lasthash+json.dumps(sections[-1]))).hexdigest()
 		lasthash = sections[-1]['hash']
 		lasthash = sections[-1]['provider']
 	sections.remove(sections[0]) ## Remove blank entry
@@ -224,16 +224,16 @@ def build(blueprint,noop=False):
 
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
-parser.add_argument('--file','-f',                action="store",      dest="vbpfilepath",    default=False,  help='VBP build blueprint file',          nargs='*')
-parser.add_argument('--build','-b',               action="store_true", dest="build",          default=False,  help='Build file')
-parser.add_argument('--noop','-n',                action="store_true", dest="noop",           default=False,  help='Displays provider output only')
-parser.add_argument('--list-store','--list','-l', action="store_true", dest="list",           default=False,  help='List stored images')
-parser.add_argument('--variables','-v',           action="store",      dest='overridevars',   default=False,  help='Override input variables on build', nargs='*')
-parser.add_argument('--show-variables','-s',      action="store_true", dest='show_variables', default=False,  help='Shows the input variables for a given *.vbp file')
-parser.add_argument('--dump-blueprint','-d',      action="store_true", dest='show_blueprint',  default=False, help='Shows the input blueprint for a given *.vbp file')
+parser.add_argument('--file','-f',                action="store",      dest="vbpfilepath",    default=False, help='Blueprint file',                    nargs='*')
+parser.add_argument('--build','-b',               action="store_true", dest="build",          default=False, help='Build blueprint')
+parser.add_argument('--noop','-n',                action="store_true", dest="noop",           default=False, help='Displays provider output only')
+parser.add_argument('--list-store','--list','-l', action="store_true", dest="list",           default=False, help='List stored images')
+parser.add_argument('--variables','-v',           action="store",      dest='overridevars',   default=False, help='Override input variables on build', nargs='*')
+parser.add_argument('--show-variables','-s',      action="store_true", dest='show_variables', default=False, help='Shows the input variables for a given *.vbp file')
+parser.add_argument('--dump-blueprint','-d',      action="store_true", dest='show_blueprint', default=False, help='Shows the input blueprint for a given *.vbp file')
 #arser.add_argument('--output-format','-o',       action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
-parser.add_argument('--input-format','-i',        action="store",      dest='input_format',   default='KEY',  help='Set the input format (JSON|Key).  Default KEY')
-parser.add_argument('--pretty','-p',              action="store_true", dest='pretty',         default=False,  help='Displays output in easily readable format')
+parser.add_argument('--input-format','-i',        action="store",      dest='input_format',   default='KEY', help='Set the input format (JSON|Key).  Default KEY')
+parser.add_argument('--pretty','-p',              action="store_true", dest='pretty',         default=False, help='Displays output in easily readable format')
 parser.add_argument('--version',                  action='version',    version='%(prog)s 1.0')
 results = parser.parse_args()
 
@@ -272,39 +272,3 @@ elif results.list:
 else:
 	raise('No input file specified')
 	sys.exit(1)
-
-'''
-## Get vbp contents
-try:
-	
-	build(filetext)
-except:
-	print('Cannot open *.vbp file')
-	sys.exit(False)
-'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
