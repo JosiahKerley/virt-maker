@@ -154,11 +154,6 @@ def build(blueprint,noop=False,nocache=True):
 
 	## Execute sections
 	for section in blueprint:
-
-		print '\n\ntop'
-		os.system('pwd')
-		os.system('ls')
-
 		steps += 1
 		providerscript = '%s/%s.py'%(providerdir,section['provider'])
 
