@@ -1,10 +1,9 @@
 import os
 def provider(body,hash,args,verbose,image,settings):
-	virtmakercache = '/var/lib/virt-maker/cache'
 	if os.path.isfile(args):
 		pass
-	elif os.path.isfile('%s/%s'%(virtmakercache,args)):
-		args = '%s/%s'%(virtmakercache,args)
+	elif os.path.isfile('%s/%s'%(settings['imgcache'],args)):
+		args = '%s/%s'%(settings['imgcache'],args)
 	else:
 		return('Cannot find "%s"'%(args))
 	if verbose:
