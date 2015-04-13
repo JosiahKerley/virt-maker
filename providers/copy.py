@@ -10,6 +10,7 @@ def provider(body,hash,args,verbose,image,settings):
 	src = args[0]
 	try: dest = args[1]
 	except: dest = src
+	if dest == "": dest = src
 	dir = os.path.dirname(dest)
 	if verbose:
 		cmd = 'virt-customize --mkdir "%s" --upload "%s":"%s" -a %s'%(dir,src,dest,hash)
