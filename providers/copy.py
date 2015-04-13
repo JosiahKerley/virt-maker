@@ -13,8 +13,7 @@ def provider(body,hash,args,verbose,image,settings):
         if dest == "": dest = src
         dir = os.path.dirname(dest)
         cmd = 'cp "%s" ".%s"'%(src,dest)
-        os.system('pwd')
-        os.system('ls')
+		print cmd
         retval = os.system(cmd)
         image.unmount(hash)
         return(retval)
