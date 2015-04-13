@@ -35,7 +35,7 @@ def provider(body,hash,args,verbose,image,settings):
 	if dest == "": dest = src
 	dir = os.path.dirname(dest)
 	if verbose:
-		cmd = 'virt-customize -v --mkdir "%s" --upload "%s":"%s" -a %s'%(dir,src,dest,hash)
+		cmd = 'virt-customize --mkdir "%s" --upload "%s":"%s" -a %s'%(dir,src,dest,hash)
 		print cmd
 	else:
 		cmd = 'virt-customize -q --mkdir "%s" --upload "%s":"%s" -a %s >/dev/null 2>&1'%(dir,src,dest,hash)
