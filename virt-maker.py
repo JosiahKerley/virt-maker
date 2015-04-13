@@ -119,7 +119,7 @@ class Image:
 		imagefile = link
 		mountdir = '%s_mount'%(imagefile)
 		if not os.path.isdir(mountdir): os.makedirs(mountdir)
-		cmd = 'guestmount -a %s --rw %s/ >/dev/null -i 2>&1'%(imagefile,mountdir)
+		cmd = 'guestmount -a %s --rw %s/ -i >/dev/null 2>&1'%(imagefile,mountdir)
 		print cmd
 		os.system(cmd)
 		os.chdir(mountdir)
