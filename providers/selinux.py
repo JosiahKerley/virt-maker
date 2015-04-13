@@ -4,6 +4,7 @@ def provider(body,hash,args,verbose,image,settings):
 	if   'disabl' in args.lower(): command = sed%('disabled')
 	elif 'enforc' in args.lower(): command = sed%('enforcing')
 	elif 'permis' in args.lower(): command = sed%('permissive')
+	elif 'label' in args.lower(): command = 'touch /.autorelabel'
 	else: return('Unknown argument')
 	if verbose:
 		cmd = 'virt-customize --run-command "%s" -a %s'%(command,hash)
