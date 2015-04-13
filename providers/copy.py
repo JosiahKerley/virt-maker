@@ -1,3 +1,4 @@
+'''
 import os
 import uuid
 def provider(body,hash,args,verbose,image,settings):
@@ -39,4 +40,3 @@ def provider(body,hash,args,verbose,image,settings):
 	else:
 		cmd = 'virt-customize -q --mkdir "%s" --upload "%s":"%s" -a %s >/dev/null 2>&1'%(dir,src,dest,hash)
 	return(os.system(cmd))
-'''
