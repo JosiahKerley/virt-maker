@@ -120,6 +120,7 @@ class Image:
 		mountdir = '%s_mount'%(imagefile)
 		if not os.path.isdir(mountdir): os.makedirs(mountdir)
 		cmd = 'guestmount -a %s -m /dev/sda1 --rw %s/ >/dev/null 2>&1'%(imagefile,mountdir)
+		print cmd
 		os.system(cmd)
 		os.chdir(mountdir)
 
@@ -129,7 +130,8 @@ class Image:
 		mountdir = '%s_mount'%(imagefile)
 		## unmount command
 		cmd = 'guestunmount %s/'%(mountdir)
-		cmd = 'umount %s/'%(mountdir)
+		#cmd = 'umount %s/'%(mountdir)
+		print cmd
 		os.system(cmd)
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
 
