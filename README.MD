@@ -382,15 +382,14 @@ Bugs
 * ~~Step body not picking up if there is no newline before the next step provider~~ ...done
 
 
-Future Features
-===============
-* Change 'templates' to 'blueprints'
-* Change '@store' to '@store'
+To Do
+=====
+* Clean up imp module parameters/marshalled arguments
+* ~~Change 'templates' to 'blueprints'~~
+* ~~Change '@cache' to '@store'~~
 * ~~Change per step hashsums to rolling hashsums~~ ...done
-* JSON blueprints
-* Snapshot only store
-* Per file sub-workspace
-* Storing JSON blueprints with stored snapshots (this would allow a "computed" lightweight link to a snapshot)
+* Build JSON blueprints from CLI
+* Centralized snapshot cache
 * Arbitrary HTTP file uploads
 * CLI argument to list providers
 
