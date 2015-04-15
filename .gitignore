@@ -43,3 +43,6 @@ Temporary Items
 .apdisk
 
 *.pyc
+
+# block packer stuffs... just in case
+packer*
