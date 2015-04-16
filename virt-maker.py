@@ -16,7 +16,8 @@ from distutils.spawn import find_executable
 settings = {
 	'verbose':True,
 	'varlib':'/var/lib/virt-maker',
-	'imgcache':'/var/lib/virt-maker/store'
+	'imgcache':'/var/lib/virt-maker/store',
+	'trycmd':True
 }
 
 ## Marshal object
@@ -109,16 +110,6 @@ def fetch(url,dest):
 
 ## Handle the image
 class Image:
-	backingimage = False
-	lastimg = False
-	buildchain = 'buildchain'
-
-	def setup(self):
-		if os.path.isfile(self.buildchain):
-			try:
-				with open(self.buildchain,'r') as f: self.chain = pickle.loads(f.read())
-			except:
-				os.remove(self.buildchain)
 
 	def snapshot(self,last,next):
 		cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1'%(last,next)
@@ -139,7 +130,6 @@ class Image:
 		mountdir = '%s_mount'%(imagefile)
 		## unmount command
 		cmd = 'guestunmount %s/'%(mountdir)
-		#cmd = 'umount %s/'%(mountdir)
 		print cmd
 		os.system(cmd)
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
@@ -147,7 +137,7 @@ class Image:
 
 ## Pre processor
 def pre():
-	for link in blueprint:
+	for link in marshal['buildchain']:
 		marshal['link'] = link
 		try:
 			module = imp.load_source(link['provider'], '%s/providers/%s.py'%(settings['varlib'], link['provider']))
@@ -183,22 +173,22 @@ def build():
 	providerdir = '%s/providers'%(settings['varlib'])
 
 	## Execute sections
-	for section in blueprint:
+	for link in marshal['buildchain']:
 		steps += 1
-		providerscript = '%s/%s.py'%(providerdir,section['provider'])
+		providerscript = '%s/%s.py'%(providerdir,link['provider'])
 
 		## Handles the providers
-		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
-		if os.path.isfile(section['hash']) and not settings['nodelta']:
+		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),link['provider'],link['argument']))
+		if os.path.isfile(link['hash']) and not settings['nodelta']:
 			pass
 		else:
 			if not os.path.isfile(providerscript):
-				if not find_executable(section['provider']) == None:  ## Handles arbitrary commands
+				if not find_executable(link['provider']) == None and settings['trycmd']:  ## Handles arbitrary commands
 					if settings['verbose']:
-						cmd = '%s %s'%(section['provider'],section['argument'])
+						cmd = '%s %s'%(link['provider'],link['argument'])
 						print(cmd)
 					else:
-						cmd = '%s %s >/dev/null 2>&1'%(section['provider'],section['argument'])
+						cmd = '%s %s >/dev/null 2>&1'%(link['provider'],link['argument'])
 					retval = os.system(cmd)
 					if not retval == 0:
 						print retval
@@ -209,16 +199,16 @@ def build():
 					exit(1)
 			else:
 				os.chdir(workingdir)
-				module = imp.load_source(section['provider'], providerscript)
+				module = imp.load_source(link['provider'], providerscript)
 				retval = 0
 				if not settings['noop']:
 					marshal = module.provider(marshal)
 				if not marshal['status']:
 					print('ERROR!')
 					sys.exit(1)
-				try: image.snapshot(lasthash,section['hash'])
+				try: image.snapshot(lasthash,link['hash'])
 				except: pass
-		if not noop: lasthash = section['hash']
+		if not noop: lasthash = link['hash']
 
 	## Finish,
 	os.chdir(cwd)
@@ -227,7 +217,7 @@ def build():
 
 ## Post processor - currently just using the preproc until changes are needed.
 def post():
-	for link in blueprint:
+	for link in marshal['buildchain']:
 		marshal['link'] = link
 		try:
 			module = imp.load_source(link['provider'], '%s/providers/%s.py'%(settings['varlib'], link['provider']))
@@ -264,6 +254,7 @@ results = parser.parse_args()
 if results.vbpfilepath:
 	settings['noop'] = results.noop
 	settings['nodelta'] = results.nodelta
+	marshal['settings'] = settings
 	for vbp in results.vbpfilepath:
 		with open(vbp,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
