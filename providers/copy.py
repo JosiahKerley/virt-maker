@@ -1,28 +1,10 @@
-'''
 import os
 import uuid
-def provider(body,hash,args,verbose,image,settings):
-        image.mount(hash)
-        ## Parse args
-        if args == "":
-                args = False
-        else:
-                args = args.split(' ')
-        src = args[0]
-        try: dest = args[1]
-        except: dest = src
-        if dest == "": dest = src
-        dir = os.path.dirname(dest)
-        cmd = 'cp "%s" ".%s"'%(src,dest)
-		print cmd
-        retval = os.system(cmd)
-        image.unmount(hash)
-        return(retval)
-
-'''
-import os
-import uuid
-def provider(body,hash,args,verbose,image,settings):
+def info():
+	return('Copies file into snapshot')
+def provider(marshal):
+	args = marshal['link']['arguments']
+	verbose = marshal['settings']['verbose']
 
 	## Parse args
 	if args == "":
@@ -39,4 +21,8 @@ def provider(body,hash,args,verbose,image,settings):
 		print cmd
 	else:
 		cmd = 'virt-customize -q --mkdir "%s" --upload "%s":"%s" -a %s >/dev/null 2>&1'%(dir,src,dest,hash)
-	return(os.system(cmd))
+	if os.system(cmd) == 0:
+		marshal['status'] = True
+	else:
+		marshal['status'] = False
+	return(marshal)

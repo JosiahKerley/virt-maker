@@ -11,15 +11,24 @@ values = {
 	"channel": None
 	}
 
+def info():
+	return('')
 
-def provider(body,hash,args,verbose,image,settings):
-	values['channel'] = args.split(' ')[0]
-	url = 'https://hooks.slack.com/services/' + args.split(' ')[-1]
-	values['text'] = body
-	data = json.dumps(values)
-	req = urllib2.Request(url, data)
-	response = urllib2.urlopen(req)
-	the_page = response.read()
-	return(0)
-	
+def provider(marshal):
+	args = marshal['link']['arguments']
+	body = marshal['link']['body']
+	verbose = marshal['settings']['verbose']
+
+	try:
+		values['channel'] = args.split(' ')[0]
+		url = 'https://hooks.slack.com/services/' + args.split(' ')[-1]
+		values['text'] = body
+		data = json.dumps(values)
+		req = urllib2.Request(url, data)
+		response = urllib2.urlopen(req)
+		the_page = response.read()
+		marshal['status'] = True
+	except:
+		marshal['status'] = False
+	return(marshal)
 	

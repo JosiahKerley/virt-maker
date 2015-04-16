@@ -1,7 +1,20 @@
 import os
 import uuid
 import shutil
-def provider(body,hash,args,verbose,image,settings):
+
+def pre(marshal):
+	command = 'virt-customize'
+	from distutils.spawn import find_executable
+	if not find_executable(command):
+		print("Cannot find file '%s'"%(command))
+		marshal['status'] = False
+	return(marshal)
+
+def provider(marshal):
+	args = marshal['link']['arguments']
+	body = marshal['link']['body']
+	verbose = marshal['settings']['verbose']
+
 
 	## Create the temp script
 	filename = '.virt-maker_shell-%s.sh'%str(uuid.uuid4())
@@ -20,4 +33,8 @@ def provider(body,hash,args,verbose,image,settings):
 		cmd = '%s "%s"'%(executor,filename)
 	else:
 		cmd = '%s "%s"'%(executor,filename)
-	return(os.system(cmd))
+	if os.system(cmd) == 0:
+		marshal['status'] = True
+	else:
+		marshal['status'] = False
+	return(marshal)

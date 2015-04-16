@@ -1,6 +1,11 @@
 import os
 import urllib2
-def provider(body,hash,args,verbose,image,settings):
+def info():
+	return('')
+def provider(marshal):
+	args = marshal['link']['arguments']
+	body = marshal['link']['body']
+	verbose = marshal['settings']['verbose']
         try:
                 download = True
                 filename = args.split('/')[-1]
@@ -19,5 +24,8 @@ def provider(body,hash,args,verbose,image,settings):
                                         if not chunk: break
                                         fp.write(chunk)
                         if verbose: print('\t"%s" complete'%(filename))
-                return(0)
-        except: return('\tCannot download "%s"'%(args))
+                marshal['status'] = True
+		except:
+			print('\tCannot download "%s"'%(args))
+			marshal['status'] = False
+	return(marshal)
