@@ -19,6 +19,15 @@ settings = {
 	'imgcache':'/var/lib/virt-maker/store'
 }
 
+## Marshal object
+marshal = {
+			"link":{},
+			"image":None,
+			"status":True,
+			"messages":[],
+			"settings":settings,
+			"buildchain":[],
+}
 
 ## Prep dirs
 dirs = [settings['varlib'],settings['imgcache']]
@@ -136,10 +145,23 @@ class Image:
 		if os.path.isdir(mountdir): shutil.rmtree(mountdir)
 
 
+## Pre processor
+def pre():
+	for link in blueprint:
+		marshal['link'] = link
+		try:
+			module = imp.load_source(link['provider'], '%s/providers/%s.py'%(settings['varlib'], link['provider']))
+			marshal = module.pre(marshal)
+		except:
+			pass
+		if not marshal['status']:
+			print('Error!')
+			sys.exit(1)
+	return(marshal)
 
 
 ## Build VBP file
-def build(blueprint,noop=False,nocache=True):
+def build():
 
 	## Main
 	'/'.join(sys.argv[-1].split('/')[:-1])
@@ -150,6 +172,9 @@ def build(blueprint,noop=False,nocache=True):
 	chain = []
 	steps = 0
 	lasthash = None
+	
+	## Prepare the marshal object
+	marshal['image'] = image
 
 	## Setup workspace
 	if not os.path.isdir(workingdir):
@@ -164,7 +189,7 @@ def build(blueprint,noop=False,nocache=True):
 
 		## Handles the providers
 		print('[ STEP ] %s/%s %s:\t%s'%(steps,len(dsl2dict(filetext)),section['provider'],section['argument']))
-		if os.path.isfile(section['hash']) and not nocache:
+		if os.path.isfile(section['hash']) and not settings['nodelta']:
 			pass
 		else:
 			if not os.path.isfile(providerscript):
@@ -186,18 +211,33 @@ def build(blueprint,noop=False,nocache=True):
 				os.chdir(workingdir)
 				module = imp.load_source(section['provider'], providerscript)
 				retval = 0
-				if not noop: retval = module.provider(section['body'],lasthash,section['argument'],settings['verbose'],image,settings)
-				if not retval == 0:
-					print retval
+				if not settings['noop']:
+					marshal = module.provider(marshal)
+				if not marshal['status']:
 					print('ERROR!')
 					sys.exit(1)
 				try: image.snapshot(lasthash,section['hash'])
 				except: pass
 		if not noop: lasthash = section['hash']
 
-	## Finish
+	## Finish,
 	os.chdir(cwd)
+	return(marshal)
 
+
+## Post processor - currently just using the preproc until changes are needed.
+def post():
+	for link in blueprint:
+		marshal['link'] = link
+		try:
+			module = imp.load_source(link['provider'], '%s/providers/%s.py'%(settings['varlib'], link['provider']))
+			marshal = module.post(marshal)
+		except:
+			pass
+		if not marshal['status']:
+			print('Error!')
+			sys.exit(1)
+	return(marshal)
 
 
 
@@ -222,6 +262,8 @@ results = parser.parse_args()
 
 ## Execute
 if results.vbpfilepath:
+	settings['noop'] = results.noop
+	settings['nodelta'] = results.nodelta
 	for vbp in results.vbpfilepath:
 		with open(vbp,'r') as f: filetext = f.read()
 		options = dsl2opt(filetext)
@@ -231,7 +273,9 @@ if results.vbpfilepath:
 					options = dict(options.items()+dsl2opt(i).items())
 				elif results.input_format.lower() == 'json':
 					options = dict(options.items()+json.loads(i).items())
-		blueprint = dsl2dict(filetext,options)
+		buildchain = dsl2dict(filetext,options)
+		marshal['buildchain'] = buildchain
+		pre()
 		if results.show_variables:
 			if results.pretty:
 				print(json.dumps(options,indent=2))
@@ -239,10 +283,12 @@ if results.vbpfilepath:
 				print(json.dumps(options))
 		if results.show_blueprint:
 			if results.pretty:
-				print(json.dumps(blueprint,indent=2))
+				print(json.dumps(buildchain,indent=2))
 			else:
-				print(json.dumps(blueprint))
-		if results.build: build(blueprint,results.noop,results.nodelta)
+				print(json.dumps(buildchain))
+		if results.build:
+			build()
+		post()
 elif results.list:
 	#files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)] ## Maybe...
 	files = os.listdir(settings['imgcache'])
