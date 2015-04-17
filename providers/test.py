@@ -1,10 +1,12 @@
 import os
 def info():
-	return('')
-def provider(marshal):
-	args = marshal['link']['arguments']
+	print('')
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 
 	retval = 0
 	lines = body.split('\n')

@@ -10,10 +10,12 @@ def pre(marshal):
 		marshal['status'] = False
 	return(marshal)
 
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 
 
 	## Create the temp script

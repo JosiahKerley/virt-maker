@@ -12,12 +12,14 @@ values = {
 	}
 
 def info():
-	return('')
+	print('')
 
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 
 	try:
 		values['channel'] = args.split(' ')[0]

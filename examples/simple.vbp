@@ -1,0 +1,20 @@
+## Simple Example
+@virt-builder centos-6
+@import centos-6.img
+@sysprep
+@selinux relabel
+@hostname simple-host
+@run yum clean all
+@run yum remove -y cloud*
+
+@file /usr/bin/simple-script
+#!/bin/bash
+echo 'It works!'
+exit 0
+
+@script
+chmod +x /usr/bin/simple-script
+/usr/bin/simple-script
+
+@copy /etc/hosts
+@store simple-image

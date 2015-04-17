@@ -6,7 +6,7 @@ def pre(marshal):
 		print("Cannot find file '%s'"%(command))
 		marshal['status'] = False
 	return(marshal)
-def provider(marshal):
+def build(marshal):
 	if verbose:
 		cmd = 'virt-customize --install %s'%(args.replace(' ',','))
 	else:

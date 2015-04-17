@@ -1,7 +1,7 @@
 import os
 import uuid
 def info():
-	return('')
+	print('')
 def pre(marshal):
 	command = 'virt-customize'
 	from distutils.spawn import find_executable
@@ -9,10 +9,12 @@ def pre(marshal):
 		print("Cannot find file '%s'"%(command))
 		marshal['status'] = False
 	return(marshal)
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 
 	## Create the temp script
 	filename = '.virt-maker_file-%s.tmp'%str(uuid.uuid4())

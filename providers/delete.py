@@ -1,6 +1,6 @@
 import os
 def info():
-	return('Deletes file/folder')
+	print('Deletes file/folder')
 def pre(marshal):
 	command = marshal['link']['provider']
 	from distutils.spawn import find_executable
@@ -8,9 +8,10 @@ def pre(marshal):
 		print("Cannot find file '%s'"%(command))
 		marshal['status'] = False
 	return(marshal)
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 	if verbose:
 		cmd = 'virt-customize --delete %s'%(args.replace(' ',','))
 	else:

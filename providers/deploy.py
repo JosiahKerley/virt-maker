@@ -10,7 +10,7 @@ defaults = {
 }
 import os
 def info():
-	return('')
+	print('')
 def pre(marshal):
 	command = 'virt-install'
 	from distutils.spawn import find_executable
@@ -18,10 +18,12 @@ def pre(marshal):
 		print("Cannot find file '%s'"%(command))
 		marshal['status'] = False
 	return(marshal)
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 	name = args.split('/')[-1]
 	name = name.replace(' ','_')
 	for line in body.split('\n'):
@@ -40,7 +42,7 @@ def provider(marshal):
 		if os.path.isfile(storefile):
 			args = storefile
 		else:
-			return('No image file found.')
+			print('No image file found.')
 	imgfile = os.path.abspath(args)
 	cmdargs = cmdargs.replace('<[args]>',imgfile)
 	os.system('virsh destroy %s'%(defaults['name']))

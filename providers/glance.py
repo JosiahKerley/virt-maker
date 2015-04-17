@@ -6,11 +6,13 @@ Usage:
 import os
 import json
 def info():
-	return('')
-def provider(marshal):
-	args = marshal['link']['arguments']
+	print('')
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 	name = args.split(' ')[0]
 	url = args.split(' ')[1]
 	imagesurl = (('%s/%s'%(url,v1/images)).replace('//','/')).replace(':/','://')

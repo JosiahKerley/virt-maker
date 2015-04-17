@@ -1,6 +1,6 @@
 import os
 def info():
-	return('')
+	print('Import/convert images for use in the buildchain')
 def pre(marshal):
 	command = 'qemu-img'
 	from distutils.spawn import find_executable
@@ -8,16 +8,18 @@ def pre(marshal):
 		print("Cannot find file '%s'"%(command))
 		marshal['status'] = False
 	return(marshal)
-def provider(marshal):
-	args = marshal['link']['arguments']
+def build(marshal):
+	args = marshal['link']['argument']
 	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 	if os.path.isfile(args):
 		pass
 	elif os.path.isfile('%s/%s'%(settings['imgcache'],args)):
 		args = '%s/%s'%(settings['imgcache'],args)
 	else:
-		return('Cannot find "%s"'%(args))
+		print('Cannot find "%s"'%(args))
 	if verbose:
 		cmd = 'qemu-img convert -O qcow2 %s %s'%(args,hash)
 		print(cmd)

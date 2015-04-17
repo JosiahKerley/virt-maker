@@ -1,10 +1,13 @@
 import os
 import uuid
 def info():
-	return('Copies file into snapshot')
-def provider(marshal):
-	args = marshal['link']['arguments']
+	print('Copies file into snapshot')
+def build(marshal):
+	args = marshal['link']['argument']
+	body = marshal['link']['body']
+	hash = marshal['link']['last']
 	verbose = marshal['settings']['verbose']
+	settings = marshal['settings']
 
 	## Parse args
 	if args == "":
