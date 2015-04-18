@@ -19,6 +19,7 @@ function build() {
 clear
 while [ 1 == 1 ]
 do
-  inotifywait -q -r -e create /opt/virt-maker/ && build
+  inotifywait -q -r -e create /opt/virt-maker/ && bash install
+  #inotifywait -q -r -e create /opt/virt-maker/ && build
   #inotifywait -q -r -e modify,attrib,close_write,move,create,delete /opt/virt-maker/ && build
 done

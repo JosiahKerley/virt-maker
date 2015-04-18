@@ -37,7 +37,7 @@ def build(marshal):
 		cmdargs += ' --%s %s'%(i,defaults[i])
 	
 	if not os.path.isfile(args):
-		storefile = '%s/%s'%(settings['imgcache'],args)
+		storefile = '%s/%s'%(settings['store'],args)
 		storefile = storefile.replace('//','/')
 		if os.path.isfile(storefile):
 			args = storefile

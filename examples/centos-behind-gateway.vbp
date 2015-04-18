@@ -1,0 +1,32 @@
+## CentOS based gateway
+
+
+##-> Variables <-##
+
+## System
+password=Password1
+ram=1024
+
+## Network
+private_net=priv0
+
+
+##-> Build <-##
+#@from centos-based-gateway.vbp
+@virt-builder centos-6
+@import centos-6.img
+@sysprep
+@selinux disable
+@hostname behind
+@rootpass <[password]>
+
+## Bounce the domain
+@script boot
+reboot
+
+@export /var/lib/libvirt/images/behind.qcow2
+@virsh destroy behind; echo ''
+@virsh undefine behind; echo ''
+@virt-install --autostart --ram <[ram]> --name behind --network network=<[private_net]> --disk path=/var/lib/libvirt/images/behind.qcow2,size=10 --wait 0 --import --force
+@clear
+@virsh console behind 
