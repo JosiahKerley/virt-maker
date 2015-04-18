@@ -22,6 +22,7 @@ settings = {
   'varlib':'/var/lib/virt-maker',
   'catalog':'/var/lib/virt-maker/catalog',
   'store':'/var/lib/virt-maker/store',
+  'providerdir':'/var/lib/virt-maker/providers',
   'trycmd':False,
   'safedelta':True
 }
@@ -180,7 +181,7 @@ def pre(marshal):
   chain = marshal['buildchain']
   for link in chain:
     marshal['link'] = link
-    providerfile = '%s/providers/%s.py' % (settings['varlib'], link['provider'])
+    providerfile = '%s/%s.py' % (settings['providerdir'], link['provider'])
     if hasHook(providerfile, 'pre'):
       module = imp.load_source('pre', providerfile)
       marshal = module.pre(marshal)
