@@ -6,8 +6,10 @@ import os
 import sys
 import imp
 import json
+import time
 import shutil
 import urllib2
+import inspect
 import hashlib
 import argparse
 import cPickle as pickle
@@ -18,7 +20,8 @@ from distutils.spawn import find_executable
 settings = {
   'verbose':True,
   'varlib':'/var/lib/virt-maker',
-  'imgcache':'/var/lib/virt-maker/store',
+  'catalog':'/var/lib/virt-maker/catalog',
+  'store':'/var/lib/virt-maker/store',
   'trycmd':False,
   'safedelta':True
 }
@@ -37,7 +40,7 @@ marshal = {
 
 
 ## Prep dirs
-dirs = [settings['varlib'], settings['imgcache']]
+dirs = [settings['varlib'], settings['store'], settings['catalog']]
 for dir in dirs:
   if not os.path.isdir(dir): os.makedirs(dir)
 
@@ -104,6 +107,17 @@ def filterPrevHash(buildchain):
   buildchain = new
   return(buildchain)
 
+
+## Searches a provider module for a given hook
+def hasHook(filepath, hookname):
+  module = imp.load_source(hookname, filepath)
+  members = inspect.getmembers(module)
+  for i in members:
+    if i[0] == hookname:
+      return(True)
+  return(False)
+
+
 ## Download files from url
 def fetch(url, dest):
   verbose("Fetching '%s'" % (url), 'Download')
@@ -124,6 +138,7 @@ def fetch(url, dest):
           lastmsg = str(percent)
       fp.write(chunk)
   verbose('Done', 'Download')
+
 
 ## Handle the image
 class Image:
@@ -162,13 +177,14 @@ class Image:
 
 ## Pre processor
 def pre(marshal):
-  for link in marshal['buildchain']:
+  chain = marshal['buildchain']
+  for link in chain:
     marshal['link'] = link
-    try:
-      module = imp.load_source(link['provider'], '%s/providers/%s.py' % (settings['varlib'], link['provider']))
+    providerfile = '%s/providers/%s.py' % (settings['varlib'], link['provider'])
+    if hasHook(providerfile, 'pre'):
+      module = imp.load_source('pre', providerfile)
       marshal = module.pre(marshal)
-    except:
-      pass
+      del module
     if not marshal['status']:
       print('Error!')
       sys.exit(1)
@@ -178,7 +194,7 @@ def pre(marshal):
 ## Build VBP file
 def build(marshal):
 
-  ## Main
+  ## Setup main
   '/'.join(sys.argv[-1].split('/')[:-1])
   vbpdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\', '/')
   workingdir = (vbpdir + '/.virt-maker')
@@ -207,7 +223,7 @@ def build(marshal):
     providerscript = '%s/%s.py' % (providerdir, link['provider'])
 
     ## Handles the providers
-    print('[ STEP ] %s/%s %s:\t%s' % (steps, len(dsl2dict(filetext)), link['provider'], link['argument']))
+    print('[ STEP ] %s/%s %s:\t%s' % (steps, len(marshal['buildchain']), link['provider'], link['argument']))
     
     if os.path.isfile(link['hash']) and not settings['nodelta']:
       skip = True
@@ -232,15 +248,18 @@ def build(marshal):
           exit(1)
       else:
         os.chdir(workingdir)
-        module = imp.load_source(link['provider'], providerscript)
-        retval = 0
-        if not settings['noop']:
-          marshal = module.build(marshal)
-        if not marshal['status']:
-          print('ERROR!')
-          sys.exit(1)
+        if hasHook(providerscript, 'build'):
+          module = imp.load_source(link['provider'], providerscript)
+          retval = 0
+          if not settings['noop']:
+            marshal = module.build(marshal)
+            del module
+          if not marshal['status']:
+            print('ERROR!')
+            sys.exit(1)
       try: image.snapshot(link['last'], link['hash'])
       except: pass
+  print('[FINISH] Execution time: %s'%(str(time.time() - starttime)))
 
   ## Finish,
   os.chdir(cwd)
@@ -283,11 +302,14 @@ results = parser.parse_args()
 
 
 ## Execute
+starttime = time.time()
 if results.vbpfilepath:
   settings['noop'] = results.noop
   settings['nodelta'] = results.nodelta
   marshal['settings'] = settings
   for vbp in results.vbpfilepath:
+    marshal['blueprint'] = {}
+    marshal['blueprint']['path'] = os.path.abspath(vbp)
     with open(vbp, 'r') as f: filetext = f.read()
     options = dsl2opt(filetext)
     if results.overridevars:
@@ -313,8 +335,8 @@ if results.vbpfilepath:
       marshal = build(marshal)
     marshal = post(marshal)
 elif results.list:
-  # files = [f for f in os.listdir(settings['imgcache']) if os.path.isfile(f)] ## Maybe...
-  files = os.listdir(settings['imgcache'])
+  # files = [f for f in os.listdir(settings['store']) if os.path.isfile(f)] ## Maybe...
+  files = os.listdir(settings['store'])
   if results.pretty:
     pass
   else:
@@ -330,4 +352,3 @@ elif results.providers:
 else:
   raise('No input file specified')
   sys.exit(1)
-print('Done')

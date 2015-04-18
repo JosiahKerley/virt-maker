@@ -12,8 +12,7 @@ function build() {
   echo ""
   echo ""
   sleep 7
-  #python /opt/virt-maker/virt-maker.py -f /opt/virt-maker/examples/simple.vbp -b --no-delta
-  python /opt/virt-maker/virt-maker.py -f /opt/virt-maker/examples/simple.vbp -b &
+  python /opt/virt-maker/virt-maker.py -f /opt/virt-maker/examples/from.vbp -b &
   sleep 1
 }
 

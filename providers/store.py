@@ -15,7 +15,7 @@ def build(marshal):
 	verbose = marshal['settings']['verbose']
 	settings = marshal['settings']
 
-	args = ('%s/%s'%(settings['imgcache'],args.split('/')[-1])).replace('//','/')
+	args = ('%s/%s'%(settings['store'],args.split('/')[-1])).replace('//','/')
 	retval = False
 	if args == "": args = False
 	if args and not args == 'export':

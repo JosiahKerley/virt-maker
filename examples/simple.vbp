@@ -18,3 +18,4 @@ chmod +x /usr/bin/simple-script
 
 @copy /etc/hosts
 @store simple-image
+@catalog

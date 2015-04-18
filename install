@@ -23,8 +23,8 @@ function pkgSetup() {
 }
 
 function packerSetup() {
-  if ! which packer;
-  then;
+  if ! which packer
+  then
     APP=packer
     TEMP=$(mktemp -p /tmp -d ${APP}-XXXX);
     cd ${TEMP};

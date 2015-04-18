@@ -16,8 +16,8 @@ def build(marshal):
 	settings = marshal['settings']
 	if os.path.isfile(args):
 		pass
-	elif os.path.isfile('%s/%s'%(settings['imgcache'],args)):
-		args = '%s/%s'%(settings['imgcache'],args)
+	elif os.path.isfile('%s/%s'%(settings['store'],args)):
+		args = '%s/%s'%(settings['store'],args)
 	else:
 		print('Cannot find "%s"'%(args))
 	if verbose:
