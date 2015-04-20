@@ -1,20 +1,22 @@
-## CentOS based gateway
+## Simple Foreman Instance
 
 
 ##-> Variables <-##
 
 ## System
+hostname=lab-foreman-01
+domain=localdomain
 password=Password1
 ram=512
 
+
 ## Network
 public_net=default
-private_net=priv0
+provision_net=provision0
 public_iface=eth0
-private_iface=eth1
-private_ip=192.168.0.10
-private_vip=192.168.0.1
-private_pre=24
+provision_iface=eth1
+provision_ip=10.0.0.1
+provision_pre=24
 
 
 ##-> Build <-##
@@ -22,38 +24,21 @@ private_pre=24
 @import centos-6.img
 @sysprep
 @selinux disable
-@hostname gateway
+@hostname <[hostname]>
 @rootpass <[password]>
 
+## Cleanup
+@run yum install -y postfix
+
 ## Main setup script
-@file /usr/bin/strap-gateway
+@file /usr/bin/strap-foreman
 #!/bin/bash
-private_ip=<[private_ip]>
+hostname=<[hostname]>
+domain=<[domain]>
+provision_ip=<[provision_ip]>
 public_iface=<[public_iface]>
-private_iface=<[private_iface]>
-private_pre=<[private_pre]>
-
-
-## Setup VRRP/keepalived
-yum install -y gcc kernel-headers kernel-devel keepalived
-priority=`echo $private_ip | cut -d'.' -f4`
-tee /etc/keepalived/keepalived.conf <<EOF
-vrrp_instance gateway {
-    state MASTER
-    interface eth1
-    virtual_router_id 51
-    priority $priority
-    advert_int 1
-    authentication {
-        auth_type PASS
-        auth_pass 1111
-    }
-    virtual_ipaddress {
-        $private_vip
-    }
-}
-EOF
-chkconfig keepalived on
+provision_iface=<[provision_iface]>
+provision_pre=<[provision_pre]>
 
 
 ## Setup sysctl
@@ -85,33 +70,22 @@ echo 'net.ipv4.tcp_wmem = 4096        16384   16777216' >> /etc/sysctl.conf
 iptables -t nat -A POSTROUTING -o $public_iface -j MASQUERADE
 service iptables save
 
-## DNSMasq
-yum install -y dnsmasq
-chkconfig dnsmasq on
-tee /etc/dnsmasq.conf <<EOF
-interface="$private_iface"
-bind-interfaces
-dhcp-range=192.168.0.50,192.168.0.100,12h
-dhcp-option=6, $public_vip, 8.8.8.8
-listen-address=127.0.0.1
-EOF
-
 ## Public network
 tee /etc/sysconfig/network-scripts/ifcfg-$public_iface <<EOF
 TYPE="Ethernet"
 BOOTPROTO="dhcp"
-NAME="$private_iface"
+NAME="$provision_iface"
 ONBOOT="yes"
 EOF
 
 ## Private network
-tee /etc/sysconfig/network-scripts/ifcfg-$private_iface <<EOF
+tee /etc/sysconfig/network-scripts/ifcfg-$provision_iface <<EOF
 TYPE="Ethernet"
 BOOTPROTO="none"
-NAME="$private_iface"
+NAME="$provision_iface"
 ONBOOT="yes"
-IPADDR="$private_ip"
-PREFIX="$private_pre"
+IPADDR="$provision_ip"
+PREFIX="$provision_pre"
 GATEWAY="$public_ip"
 DNS1="$public_ip"
 DNS2="8.8.8.8"
@@ -119,39 +93,60 @@ DNS3="8.8.4.4"
 EOF
 
 
+## Setup Foreman
+echo "$provision_ip $hostname.$domain $hostname" >> /etc/hosts
+yum-config-manager -y --enable rhel-6-server-optional-rpms rhel-server-rhscl-6-rpms
+yum install -y epel-release
+yum clean
+for port in "53 67 68 69 80 443 3000 3306 5910-5930 5432 8140 8443"
+do
+  iptables -A INPUT -p tcp -m tcp --dport $port -j ACCEPT
+done
+iptables -A INPUT -p tcp -m udp --dport 53 -j ACCEPT
+yum -y install http://yum.theforeman.org/releases/1.7/el6/x86_64/foreman-release.rpm
+yum -y install foreman-installer
+foreman-installer \
+  --enable-foreman \
+  --enable-foreman-compute-libvirt \
+  --enable-foreman-compute-openstack \
+  --enable-foreman-compute-ovirt \
+  --enable-foreman-compute-vmware \
+  --enable-foreman-plugin-bootdisk \
+  --enable-foreman-plugin-default-hostgroup \
+  --enable-foreman-plugin-discovery \
+  --enable-foreman-plugin-hooks \
+  --enable-foreman-plugin-ovirt-provision \
+  --enable-foreman-plugin-puppetdb \
+  --enable-foreman-plugin-setup \
+  --enable-foreman-plugin-tasks \
+  --enable-foreman-plugin-templates \
+  --enable-foreman-proxy \
+  --enable-foreman-proxy-plugin-pulp \
+  --enable-puppet
+
+
 ## Insert mac hwaddrs
 @script boot
 public_iface=<[public_iface]>
-private_iface=<[private_iface]>
+provision_iface=<[provision_iface]>
 echo HWADDR="`ifconfig $public_iface | grep 'HWaddr' | awk '{ print $5}'`" >> /etc/sysconfig/network-scripts/ifcfg-$public_iface
-echo HWADDR="`ifconfig $private_iface | grep 'HWaddr' | awk '{ print $5}'`" >> /etc/sysconfig/network-scripts/ifcfg-$private_iface
+echo HWADDR="`ifconfig $provision_iface | grep 'HWaddr' | awk '{ print $5}'`" >> /etc/sysconfig/network-scripts/ifcfg-$provision_iface
 service network restart
 service dnsmasq restart
 reboot
 
-@file /usr/bin/status
-#!/bin/bash
-while [ 1 == 1 ]
-do
-  clear
-  cat /var/lib/dnsmasq/dnsmasq.leases
-  sleep 2
-done
+@run chmod +x /usr/bin/strap-foreman
+@run bash /usr/bin/strap-foreman
+@export /var/lib/libvirt/images/<[hostname]>.qcow2
 
-@run chmod +x /usr/bin/status
-@run chmod +x /usr/bin/strap-gateway
-@run bash /usr/bin/strap-gateway
-@export /var/lib/libvirt/images/gateway.qcow2
-
-@net-define <[private_net]>
+@net-define <[provision_net]>
 <network>
-  <name>priv0</name>
-  <bridge name="priv0" />
+  <name><[provision_net]></name>
+  <bridge name="<[provision_net]>" />
 </network>
 
-@virsh destroy gateway; echo ''
-@virsh undefine gateway; echo ''
-@virt-install --autostart --ram <[ram]> --name gateway --network network=<[public_net]> --network network=<[private_net]> --disk path=/var/lib/libvirt/images/gateway.qcow2,size=10 --wait 0 --import --force
+@virsh destroy <[hostname]>; echo ''
+@virsh undefine <[hostname]>; echo ''
+@virt-install --autostart --ram <[ram]> --name <[hostname]> --network network=<[public_net]> --network network=<[provision_net]> --disk path=/var/lib/libvirt/images/<[hostname]>.qcow2,size=10 --wait 0 --import --force
 @clear
-#@virsh console gateway
 @catalog

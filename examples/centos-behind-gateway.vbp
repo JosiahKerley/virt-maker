@@ -12,7 +12,7 @@ private_net=priv0
 
 
 ##-> Build <-##
-#@from centos-based-gateway.vbp
+@from centos-based-gateway.vbp
 @virt-builder centos-6
 @import centos-6.img
 @sysprep
@@ -29,4 +29,4 @@ reboot
 @virsh undefine behind; echo ''
 @virt-install --autostart --ram <[ram]> --name behind --network network=<[private_net]> --disk path=/var/lib/libvirt/images/behind.qcow2,size=10 --wait 0 --import --force
 @clear
-@virsh console behind 
+#@virsh console behind 

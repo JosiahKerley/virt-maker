@@ -17,7 +17,9 @@ def build(marshal):
     if os.system(cmd) == 0:
       marshal['status'] = True
     else:
+      print('Virt-Builder Failed!')
       marshal['status'] = False
   else:
+    print('skipping...')
     marshal['status'] = 'Skip'
   return(marshal)

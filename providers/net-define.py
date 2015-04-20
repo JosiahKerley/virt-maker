@@ -16,10 +16,13 @@ def build(marshal):
 	## Parse args
 	if verbose:
 		cmd = 'virsh net-destroy %s; virsh net-define %s; virsh net-autostart %s; virsh net-start %s'%(args,args,filename,args)
+		cmd = 'virsh net-define %s; virsh net-autostart %s; virsh net-start %s'%(filename,args,args)
 		print cmd
 	else:
 		cmd = 'virsh net-destroy %s >/dev/null 2>&1; virsh net-define %s >/dev/null 2>&1; virsh net-autostart %s >/dev/null 2>&1; virsh net-start %s >/dev/null 2>&1'%(args,filename,args)
-	if os.system(cmd) == 0:
+		cmd = 'virsh net-define %s >/dev/null 2>&1; virsh net-autostart %s >/dev/null 2>&1; virsh net-start %s >/dev/null 2>&1'%(args,filename,args)
+	#if os.system(cmd) == 0:
+	if os.system(cmd):
 		marshal['status'] = True
 	else:
 		marshal['status'] = False

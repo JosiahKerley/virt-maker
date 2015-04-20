@@ -22,6 +22,7 @@ settings = {
   'varlib':'/var/lib/virt-maker',
   'catalog':'/var/lib/virt-maker/catalog',
   'store':'/var/lib/virt-maker/store',
+  'cache':'/var/lib/virt-maker/cache',
   'providerdir':'/var/lib/virt-maker/providers',
   'trycmd':True,
   'safedelta':True
@@ -41,7 +42,7 @@ marshal = {
 
 
 ## Prep dirs
-dirs = [settings['varlib'], settings['store'], settings['catalog']]
+dirs = [settings['varlib'], settings['store'], settings['catalog'], settings['cache']]
 for dir in dirs:
   if not os.path.isdir(dir): os.makedirs(dir)
 
@@ -178,6 +179,7 @@ class Image:
 
 ## Pre processor
 def pre(marshal):
+  orig = marshal
   chain = marshal['buildchain']
   for link in chain:
     marshal['link'] = link
@@ -196,10 +198,12 @@ def pre(marshal):
 ## Build VBP file
 def build(marshal):
 
+
   ## Setup main
   '/'.join(sys.argv[-1].split('/')[:-1])
   vbpdir = os.path.abspath('/'.join(sys.argv[-1].split('/')[:-1])).replace('\\', '/')
-  workingdir = (vbpdir + '/.virt-maker')
+  #workingdir = (vbpdir + '/.virt-maker')
+  workingdir = settings['cache']
   image = Image()
   cwd = os.getcwd()
   chain = []
@@ -289,6 +293,7 @@ def post(marshal):
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
 parser.add_argument('--file', '-f', action="store", dest="vbpfilepath", default=False, help='Blueprint file', nargs='*')
 parser.add_argument('--build', '-b', action="store_true", dest="build", default=False, help='Build blueprint')
+parser.add_argument('--catalog', '-c', action="store_true", dest="catalog", default=False, help='Catalog blueprint')
 parser.add_argument('--noop', '-n', action="store_true", dest="noop", default=False, help='Displays provider output only')
 parser.add_argument('--list-store', '--list', '-l', action="store_true", dest="list", default=False, help='List stored images')
 parser.add_argument('--list-providers', '--providers', action="store_true", dest="providers", default=False, help='List providers')
@@ -323,6 +328,10 @@ if results.vbpfilepath:
     buildchain = dsl2dict(filetext, options)
     marshal['buildchain'] = filterPrevHash(buildchain)
     marshal = pre(marshal)
+    if results.catalog:
+      dest = vbp.split('/')[-1]
+      dest = '%s/%s'%(settings['catalog'] ,dest)
+      shutil.copy2(vbp,dest)
     if results.show_variables:
       if results.pretty:
         print(json.dumps(options, indent=2))
