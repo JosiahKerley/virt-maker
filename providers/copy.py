@@ -14,7 +14,7 @@ def build(marshal):
 		args = False
 	else:
 		args = args.split(' ')
-	src = args[0]
+	src = os.path.abspath(args[0])
 	try: dest = args[1]
 	except: dest = src
 	if dest == "": dest = src
