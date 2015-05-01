@@ -1,10 +1,9 @@
 import os
-import re
 def info():
 	print('')
 
 def pre(marshal):
-	command = 'virt-customize'
+	command = 'virt-resize'
 	from distutils.spawn import find_executable
 	if not find_executable(command):
 		print("Cannot find file '%s'"%(command))
@@ -18,15 +17,10 @@ def build(marshal):
 	verbose = marshal['settings']['verbose']
 	settings = marshal['settings']
 
-	if '--nochroot' in args:
-		args = args.replace('--nochroot','')
-		cmd = '%s'%(args)
+	if verbose:
+		cmd = 'virt-resize --verbose %s'%(args)
 	else:
-		if verbose:
-			cmd = 'virt-customize --run-command "%s" -a %s'%(args,hash)
-		else:
-			cmd = 'virt-customize -q --run-command "%s" -a %s >/dev/null 2>&1'%(args,hash)
-
+		cmd = 'virt-resize %s >/dev/null 2>&1'%(args)
 	if os.system(cmd) == 0:
 		marshal['status'] = True
 	else:
