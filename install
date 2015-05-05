@@ -16,10 +16,11 @@ function pkgSetup() {
   chmod 1750 ${BIN_PREFIX}/virt-maker;
   chown root:libvirt ${BIN_PREFIX}/virt-maker;
 
-  mkdir -p ${LIB_PREFIX}/{cache,providers};
+  mkdir -p ${LIB_PREFIX};
+  chmod 2770 ${LIB_PREFIX};
+  mkdir -m 2770 -p ${LIB_PREFIX}/{cache,providers};
   yes | cp -r providers/* ${LIB_PREFIX}/providers/;
   chown -R root:libvirt ${LIB_PREFIX};
-  chmod 2770 ${LIB_PREFIX};
 }
 
 function packerSetup() {
