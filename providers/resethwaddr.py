@@ -29,9 +29,11 @@ do
   mac=`echo $link | cut -d',' -f2`
   if [ -f /etc/sysconfig/network-scripts/ifcfg-$iface ]
   then
+    echo "Setting $iface's HWADDR to $mac in /etc/sysconfig/network-scripts/ifcfg-$iface"
     sed -i "/^HWADDR.*/s/^HWADDR.*/HWADDR=$mac/g" /etc/sysconfig/network-scripts/ifcfg-$iface
   fi
 done
+service network restart
 	'''
 
 	## Create the temp script
