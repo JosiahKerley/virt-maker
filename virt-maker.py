@@ -56,7 +56,7 @@ def dsl2opt(text, providerchar='@'):
   options = {}
   text = '\n' + text
   text = text.replace('\n%s' % (providerchar), '\n\n%s' % (providerchar))
-  headertext = text.split('%s' % (providerchar))[0]
+  headertext = text.split('\n%s' % (providerchar))[0]
   for i in headertext.split('\n'):
     if '=' in i:
       key = i.split('=')[0]
