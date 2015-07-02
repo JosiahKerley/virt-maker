@@ -4,10 +4,10 @@
 ## Prereqs
 cwd=`pwd`
 pkg=None
-if which yum; then; pkg=yum; fi
-if which apt-get; then; pkg=apt-get; fi
-if [ "$pkg" == "None" ]; then; echo "Unknown Package Manager"; exit 1; fi
-if ! which git; then; $pkg install -y git; fi
+if which yum; then pkg=yum; fi
+if which apt-get; then pkg=apt-get; fi
+if [ "$pkg" == "None" ]; then echo "Unknown Package Manager"; exit 1; fi
+if ! which git; then $pkg install -y git; fi
 
 
 ## Fetch
