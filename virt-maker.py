@@ -303,7 +303,8 @@ parser.add_argument('--dump-blueprint', '-d', action="store_true", dest='show_bl
 # arser.add_argument('--output-format','-o',           action="store",      dest='output_format',  default='JSON', help='Set the output format (JSON|Key).  Default JSON')
 parser.add_argument('--input-format', '-i', action="store", dest='input_format', default='KEY', help='Set the input format (JSON|Key).  Default KEY')
 parser.add_argument('--pretty', '-p', action="store_true", dest='pretty', default=False, help='Displays output in easily readable format')
-parser.add_argument('--no-delta', action="store_true", dest='nodelta', default=False, help='Build blueprint without using deltas')
+parser.add_argument('--no-cache', action="store_true", dest='nodelta', default=False, help='Build blueprint without using cache')
+parser.add_argument('--flush-cache', action="store_true", dest='flushcache', default=False, help='Remove all snapshots from cache')
 parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 results = parser.parse_args()
 
@@ -360,6 +361,9 @@ elif results.providers:
   else:
     for i in files:
       print i
+elif results.flushcache:
+  cmd = 'rm -rf "%s/*"'%(settings['cache'])
+  os.system(cmd)
 else:
   raise('No input file specified')
   sys.exit(1)
