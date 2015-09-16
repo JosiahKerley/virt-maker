@@ -154,16 +154,24 @@ class Image:
       os.remove(next)
 
   def mount(self, link):
-    imagefile = link
+    imagefile = link   
     mountdir = '%s_mount' % (imagefile)
-    if not os.path.isdir(mountdir): os.makedirs(mountdir)
+    if not os.path.isdir(mountdir):
+      try: os.makedirs(mountdir)
+      except: pass  
     cmd = 'guestmount -a %s --rw %s/ -i >/dev/null 2>&1' % (imagefile, mountdir)
     if settings['verbose'] > 1:
       cmd = 'guestmount -a %s --rw %s/ -i' % (imagefile, mountdir)
       print(cmd)
-    os.system(cmd)
+    try: os.system(cmd)
+    except:
+      os.chdir(mountdir)
+      self.unmount(link)
+      os.system(cmd)
     os.system('ls')
+    os.system('pwd')
     os.chdir(mountdir)
+
 
   def unmount(self, link):
     os.chdir('..')
