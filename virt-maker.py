@@ -146,6 +146,7 @@ def fetch(url, dest):
 class Image:
 
   def snapshot(self, last, next):
+    os.chdir(settings['cache'])
     cmd = 'qemu-img create -f qcow2 -b %s %s >/dev/null 2>&1' % (last, next)
     if settings['verbose'] > 1:
       cmd = 'qemu-img create -f qcow2 -b %s %s' % (last, next)
