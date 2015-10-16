@@ -179,9 +179,9 @@ def build(marshal):
   vmdk = inputfile.replace('qcow2','')+'vmdk'
   for line in body.split('\n'):
     if '=' in line and not '#' in line:
-	  left = line.split('=')[0]
-	  right = line.split('=')[-1]
-	  defaults[left] = right
+    left = line.split('=')[0]
+    right = line.split('=')[-1]
+    defaults[left] = right
   if defaults['filename'] == None:
     defaults['filename'] = inputfile.replace('qcow2','')+'ova'
   if defaults['name'] == None:
