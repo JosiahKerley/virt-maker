@@ -1,5 +1,5 @@
 #!/bin/bash
-
+## bash < <(curl -s https://raw.githubusercontent.com/JosiahKerley/virt-maker/master/install-online)
 
 ## Prereqs
 cwd=`pwd`
@@ -20,6 +20,10 @@ cd virt-maker
 ## Install
 bash install-safe
 if [ ! -f /usr/local/bin/virt-maker ]; then echo "It doesn't look like it installed"; exit 1
+
+
+## Other
+yum install -y libguestfs* virt-* || apt-get install -y libguestfs* virt-*
 
 
 ## Cleanup

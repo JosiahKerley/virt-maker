@@ -8,6 +8,7 @@ import imp
 import json
 import time
 import shutil
+import jinja2
 import urllib2
 import inspect
 import hashlib
@@ -95,6 +96,46 @@ def dsl2dict(text, options=False, mutatestr='<[%s]>', providerchar='@'):
       lastprovider = sections[-1]['provider']
       sections[-1]['hash'] = hashlib.md5(lasthash + json.dumps(sections[-1])).hexdigest()
       lasthash = sections[-1]['hash']
+  return(sections)
+
+
+## Parses YAML Statements
+def yml2dict(text):
+  data_raw = yaml.load(text)
+  env = jinja2.Environment()
+  namespace = {}
+  parameters = {}
+  definitionOrig = yaml.load(text)
+  lastEval = 'start'
+  definition = definitionOrig
+  while not json.dumps(definition) == lastEval:
+    lastEval = json.dumps(definition)
+    definition = load(env.from_string(dump(definitionOrig)).render(definition))
+  count_steps = len(definition['steps'])
+  steps_messy = definition['steps']
+
+  steps = []
+  for step in steps_messy:
+    corrected = {'provider':step.keys()[0]}
+    if not type(step.keys()[0]) == type({}):
+      corrected['argument'] = step[step.keys()[0]]
+      corrected['body'] = ''
+    else:
+      corrected['argument'] = step['args']
+      corrected['body'] = step['body']
+    steps.append(corrected)
+
+  c = 0
+  lastprovider = ''
+  sections = steps
+  while c <= len(sections):
+    if sections[-1]['provider'] == '':
+      sections[-1]['provider'] = lastprovider
+    lastprovider = sections[-1]['provider']
+    sections[-1]['hash'] = hashlib.md5(lasthash + json.dumps(sections[-1])).hexdigest()
+    lasthash = sections[-1]['hash']
+    c += 1
+
   return(sections)
 
 
@@ -204,6 +245,9 @@ def pre(marshal):
   return(marshal)
 
 
+## YAML based Blueprints
+
+
 ## Build VBP file
 def build(marshal):
 
@@ -300,7 +344,8 @@ def post(marshal):
 
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
-parser.add_argument('--file', '-f', action="store", dest="vbpfilepath", default=False, help='Blueprint file', nargs='*')
+parser.add_argument('--file', '-f', action="store", dest="vbpfilepath", default=False, help='DSL based blueprint file', nargs='*')
+parser.add_argument('--yaml', '-y', action="store", dest="ymlfilepath", default=False, help='YAML based blueprint file', nargs='*')
 parser.add_argument('--build', '-b', action="store_true", dest="build", default=False, help='Build blueprint')
 parser.add_argument('--catalog', '-c', action="store_true", dest="catalog", default=False, help='Catalog blueprint')
 parser.add_argument('--noop', '-n', action="store_true", dest="noop", default=False, help='Displays provider output only')
@@ -320,6 +365,19 @@ results = parser.parse_args()
 
 ## Execute
 starttime = time.time()
+
+
+
+
+
+
+
+
+
+
+
+
+
 if results.vbpfilepath:
   settings['noop'] = results.noop
   settings['nodelta'] = results.nodelta
@@ -355,6 +413,40 @@ if results.vbpfilepath:
     if results.build:
       marshal = build(marshal)
     marshal = post(marshal)
+
+
+
+elif results.ymlfilepath:
+  settings['noop'] = results.noop
+  settings['nodelta'] = results.nodelta
+  marshal['settings'] = settings
+  for yml in results.ymlfilepath:
+    marshal['blueprint'] = {}
+    marshal['blueprint']['path'] = os.path.abspath(vbp)
+    with open(yml, 'r') as f: filetext = f.read()
+    buildchain = yml2dict(filetext)
+    marshal['buildchain'] = filterPrevHash(buildchain)
+    marshal = pre(marshal)
+    if results.catalog:
+      dest = vbp.split('/')[-1]
+      dest = '%s/%s'%(settings['catalog'] ,dest)
+      shutil.copy2(vbp,dest)
+    if results.show_variables:
+      if results.pretty:
+       	print(json.dumps(options, indent=2))
+      else:
+        print(json.dumps(options))
+    if results.show_blueprint:
+      if results.pretty:
+        print(json.dumps(buildchain, indent=2))
+      else:
+        print(json.dumps(buildchain))
+    if results.build:
+      marshal = build(marshal)
+    marshal = post(marshal)
+
+
+
 elif results.list:
   # files = [f for f in os.listdir(settings['store']) if os.path.isfile(f)] ## Maybe...
   files = os.listdir(settings['store'])
