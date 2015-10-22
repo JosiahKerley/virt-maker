@@ -12,7 +12,7 @@ def pre(marshal):
   return(marshal)
 
 def build(marshal):
-  args = (marshal['link']['argument']).replace(' ',',')
+  args = ((marshal['link']['argument']).replace(' ',',')).replace(',,',',')
   body = marshal['link']['body']
   hash = marshal['link']['last']
   verbose = marshal['settings']['verbose']
