@@ -13,6 +13,7 @@ import urllib2
 import inspect
 import hashlib
 import argparse
+import filelock
 import cPickle as pickle
 from distutils.spawn import find_executable
 
@@ -42,6 +43,11 @@ marshal = {
 }
 
 
+## Globals
+locks = {}
+
+
+
 ## Prep dirs
 dirs = [settings['varlib'], settings['store'], settings['catalog'], settings['cache']]
 for dir in dirs:
@@ -51,6 +57,12 @@ for dir in dirs:
 def verbose(text, label='INFO'):
   print('\t%s: %s' % (label, text))
 
+
+## Exit cleanup
+def cleanup():
+  global locks
+  for lock in locks:
+    (locks[lock]).release()
 
 ## Parses DSL Variables
 def dsl2opt(text, providerchar='@'):
@@ -196,7 +208,15 @@ class Image:
       os.remove(next)
 
   def mount(self, link):
-    imagefile = link   
+    imagefile = link
+    locks[imagefile] = lock = filelock.FileLock(imagefile)
+    while True:
+      try:
+        with locks[imagefile].acquire(timeout = 10):
+          break
+      except:
+        print('File {} locked'.format(locks[imagefile]))
+        time.sleep(10)
     mountdir = '%s_mount' % (imagefile)
     if not os.path.isdir(mountdir):
       try: os.makedirs(mountdir)
@@ -213,6 +233,7 @@ class Image:
     os.system('ls')
     os.system('pwd')
     os.chdir(mountdir)
+    (locks[imagefile]).release()
 
 
   def unmount(self, link):
@@ -467,4 +488,6 @@ elif results.flushcache:
   os.system(cmd)
 else:
   raise('No input file specified')
+  cleanup()
   sys.exit(1)
+cleanup()

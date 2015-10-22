@@ -40,6 +40,7 @@ function packerSetup() {
 function pythonDeps() {
   if ! which redis-cli; then yum install -y redis; fi;
   if ! which pip; then yum install -y python-pip; fi;
+  if ! ls ${PYTHON_PREFIX}/filelock; then pip install filelock; fi;
   if ! ls ${PYTHON_PREFIX}/jinja2; then pip install jinja2; fi;
   if ! ls ${PYTHON_PREFIX}/redis; then pip install redis; fi;
   if ! ls ${PYTHON_PREFIX}/pexpect; then pip install pexpect; fi;
