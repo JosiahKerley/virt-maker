@@ -445,9 +445,10 @@ To Do
 Other Thoughts
 ==============
 * Tmpfs build workspace
-* Native Jinja2 incorporation
+* ~~Native Jinja2 incorporation~~ Now implemented as "Jinja Enhanced DSL"
 * Glance integration
-* Generate equivalent bash script that performs build
+* ~~Generate equivalent bash script that performs build~~ Out of scope
+* Load parameters from YAML for JED blueprints
 
 
 
