@@ -18,7 +18,7 @@ setup(name='Virt-Maker',
   author='Josiah Kerley',
   author_email='josiahkerley@gmail.com',
   url='https://github.com/JosiahKerley/virt-maker',
-  requires=['argparse','pyyaml','filelock','jinja2'],
+  install_requires=['argparse','pyyaml','filelock','jinja2'],
 )
 
 
