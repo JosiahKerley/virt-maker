@@ -7,6 +7,7 @@ import sys
 import imp
 import json
 import time
+import yaml
 import shutil
 import jinja2
 import urllib2
@@ -215,12 +216,12 @@ class Image:
         with locks[imagefile].acquire(timeout = 10):
           break
       except:
-        print('File {} locked'.format(locks[imagefile]))
+        print('[ Lock ] File {} locked, waiting'.format(locks[imagefile]))
         time.sleep(10)
     mountdir = '%s_mount' % (imagefile)
     if not os.path.isdir(mountdir):
       try: os.makedirs(mountdir)
-      except: pass  
+      except: pass
     cmd = 'guestmount -a %s --rw %s/ -i >/dev/null 2>&1' % (imagefile, mountdir)
     if settings['verbose'] > 1:
       cmd = 'guestmount -a %s --rw %s/ -i' % (imagefile, mountdir)
@@ -283,8 +284,8 @@ def build(marshal):
   chain = []
   steps = 0
   delta = True
-  
-  
+
+
   ## Prepare the marshal object
   marshal['image'] = image
 
@@ -304,7 +305,7 @@ def build(marshal):
 
     ## Handles the providers
     print('[ STEP ] %s/%s %s:\t%s' % (steps, len(marshal['buildchain']), link['provider'], link['argument']))
-    
+
     if os.path.isfile(link['hash']) and not settings['nodelta']:
       skip = True
     if skip and delta:
@@ -363,10 +364,30 @@ def post(marshal):
 
 
 
+## Jinja handler
+def handle_jinja(text):
+  """ Handles parsing the Jinja DSL """
+  template = '\n@'+text.split('\n@',1)[-1] ## Breaks out the YAML from the DSL
+  text = text.replace(template,'')       ##
+  buff = ''                                     ## Stream loads the YAML
+  for line in text.split('\n'):                 ##
+    if not line.startswith('#'):                ##
+      try:                                      ##
+        buff += line+'\n'                       ##
+        yaml.load(buff)                         ##
+      except:                                   ##
+        buff = '\n'.join(buff.split('\n')[:-2]) ##
+        break                                   ##
+  dsl = jinja2.Environment().from_string(template).render(yaml.load(buff)) ## Render the DSL
+  return(dsl)
+
+
+
 ## Arguments
 parser = argparse.ArgumentParser(description='Libvirt based VM builder')
 parser.add_argument('--file', '-f', action="store", dest="vbpfilepath", default=False, help='DSL based blueprint file', nargs='*')
 parser.add_argument('--yaml', '-y', action="store", dest="ymlfilepath", default=False, help='YAML based blueprint file', nargs='*')
+parser.add_argument('--jinja', '-j', action="store_true", dest="jinja", default=False, help='Jinja enhanced blueprint parser')
 parser.add_argument('--build', '-b', action="store_true", dest="build", default=False, help='Build blueprint')
 parser.add_argument('--catalog', '-c', action="store_true", dest="catalog", default=False, help='Catalog blueprint')
 parser.add_argument('--noop', '-n', action="store_true", dest="noop", default=False, help='Displays provider output only')
@@ -407,6 +428,8 @@ if results.vbpfilepath:
     marshal['blueprint'] = {}
     marshal['blueprint']['path'] = os.path.abspath(vbp)
     with open(vbp, 'r') as f: filetext = f.read()
+    if results.jinja:
+      filetext = handle_jinja(filetext)
     options = dsl2opt(filetext)
     if results.overridevars:
       for i in results.overridevars:
