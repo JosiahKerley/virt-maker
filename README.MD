@@ -13,18 +13,31 @@ This is tool that allows you to write a fairly simple template (or script if you
 Command Line:
 =============
 ```
-usage: virt-maker [-h] [--file [VBPFILEPATH [VBPFILEPATH ...]]] [--build] [--noop] [--list-store] [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]] [--show-variables] [--dump-blueprint] [--input-format INPUT_FORMAT] [--pretty] [--version]
+usage: virt-maker.py [-h] [--file [VBPFILEPATH [VBPFILEPATH ...]]]
+                     [--yaml [YMLFILEPATH [YMLFILEPATH ...]]] [--jinja]
+                     [--build] [--catalog] [--noop] [--list-store]
+                     [--list-providers]
+                     [--variables [OVERRIDEVARS [OVERRIDEVARS ...]]]
+                     [--show-variables] [--dump-blueprint]
+                     [--input-format INPUT_FORMAT] [--pretty] [--no-cache]
+                     [--flush-cache] [--version]
 
 Libvirt based VM builder
 
 optional arguments:
   -h, --help            show this help message and exit
   --file [VBPFILEPATH [VBPFILEPATH ...]], -f [VBPFILEPATH [VBPFILEPATH ...]]
-                        VBP build blueprint file
-  --build, -b           Build file
+                        DSL based blueprint file
+  --yaml [YMLFILEPATH [YMLFILEPATH ...]], -y [YMLFILEPATH [YMLFILEPATH ...]]
+                        YAML based blueprint file
+  --jinja, -j           Jinja enhanced blueprint parser
+  --build, -b           Build blueprint
+  --catalog, -c         Catalog blueprint
   --noop, -n            Displays provider output only
   --list-store, --list, -l
                         List stored images
+  --list-providers, --providers
+                        List providers
   --variables [OVERRIDEVARS [OVERRIDEVARS ...]], -v [OVERRIDEVARS [OVERRIDEVARS ...]]
                         Override input variables on build
   --show-variables, -s  Shows the input variables for a given *.vbp file
@@ -32,6 +45,8 @@ optional arguments:
   --input-format INPUT_FORMAT, -i INPUT_FORMAT
                         Set the input format (JSON|Key). Default KEY
   --pretty, -p          Displays output in easily readable format
+  --no-cache            Build blueprint without using cache
+  --flush-cache         Remove all snapshots from cache
   --version             show program's version number and exit
 ```
 
@@ -372,6 +387,39 @@ ram=2048
 ## Post slack message
 @slack <[SLACKCHANNEL]> <[SLACKKEY]>
 Build "<[HOSTNAME]>" Complete
+```
+
+
+Jinja Enhanced DSL
+==================
+```
+#!/usr/local/bin/virt-maker -jf
+#
+#    Example of mixed style YAML parsing
+# for jinja templates.  This would use any hash
+# table as params rather than a flat k/v that
+# will get injected into the namespace and
+# render the DSL using jinja alone.  By default,
+# the parser will use the default DSL, but with
+# the --jinja or -j switch, it would expect
+# this syntax.
+#
+system:
+  hostname: foo
+  domain: bar
+apps:
+  - emacs
+  - vim
+  - screen
+  - tmux
+
+@virt-builder centos-7.1
+@import centos-7.1.img
+@hostname {{ system.hostname }}.{{ system.domain }}
+{% for app in apps %}
+@install {{ app }}
+{% endfor %}
+@store {{ system.hostname }}
 ```
 
 
