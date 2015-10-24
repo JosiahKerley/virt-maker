@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import sys
-from distutils.core import setup
+from setuptools import setup
+
 
 ## Globals
 here = os.path.dirname(os.path.realpath(__file__))
@@ -12,15 +13,28 @@ install_dirs = [
   '/var/lib/virt-maker/providers',
 ]
 
-setup(name='Virt-Maker',
-  version='0.2',
-  description='Libvirt based VM builder',
-  author='Josiah Kerley',
-  author_email='josiahkerley@gmail.com',
-  url='https://github.com/JosiahKerley/virt-maker',
-  install_requires=['argparse','pyyaml','filelock','jinja2'],
-)
 
+## Globals
+here = os.path.dirname(os.path.realpath(__file__))
+install_file = '/usr/local/bin/virt-maker'
+install_dirs = [
+  '/usr/local/bin',
+  '/var/lib/virt-maker',
+  '/var/lib/virt-maker/providers',
+]
+
+
+## Main Setup
+setup(
+  name             = 'virt-maker',
+  version          = '0.1.2',
+  description      = 'Virtual machine build tool',
+  author           = 'Josiah Kerley',
+  author_email     = 'josiahkerley@gmail.com',
+  url              = 'https://github.com/JosiahKerley/virt-maker',
+  install_requires = ['argparse','PyYAML','filelock','jinja2'],
+  zip_safe         = True,
+)
 
 ## Copy
 if 'install' in sys.argv:
