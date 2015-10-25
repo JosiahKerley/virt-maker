@@ -1,5 +1,4 @@
-#!/usr/bin/env python 
-
+#!/usr/bin/python
 
 ## Import libraries
 import os
@@ -49,6 +48,124 @@ locks = {}
 
 
 
+## File locking
+class Flock:
+
+  ## Imports
+  import os
+  import time
+  import uuid
+  import hashlib
+  import threading
+  from cPickle import loads as load_
+  from cPickle import dumps as dump_
+
+
+  ## Globals
+  locks       = {}
+  threads     = {}
+  evaluations = 5
+  eval_delay  = 1
+  lock_poll   = 0.1
+  lock_life   = None
+
+
+  ## Methods
+
+  def __init__(self,lockroot='/tmp'):
+    """ Constructor """
+    self.lockroot = lockroot
+    self.id = str(self.uuid.uuid4())
+
+
+  def load(self,filepath):
+    """ Load method """
+    if self.os.path.isfile(filepath):
+      with open(filepath,'r') as f:
+        return(self.load_(f.read()))
+    return(False)
+
+
+  def dump(self,data,filepath):
+    """ Load method """
+    with open(filepath,'w') as f:
+      return(f.write(self.dump_(data)))
+
+
+  def get_lock_file(self,filepath):
+    """ Gets a lockfile path for a given file path """
+    filepath = self.os.path.abspath(filepath)
+    filehash = str(self.hashlib.md5(filepath).hexdigest())
+    lockfile_path = self.os.path.join(self.lockroot,'.'+filehash+'.lock')
+    return(lockfile_path)
+
+
+  def is_locked(self,filepath):
+    """ Returns whether or not the given file is locked """
+    lockfile = self.get_lock_file(filepath)
+    self.time.sleep(self.eval_delay)
+    if self.os.path.isfile(lockfile):
+      lock = self.load(lockfile)
+      time = lock['timestamp']
+      locked = False
+      for i in range(1,self.evaluations):
+        self.time.sleep(self.eval_delay)
+        lock = self.load(lockfile)
+        try:
+          if not time == lock['timestamp']:
+            locked = True
+        except:
+          locked = True
+      return(locked)
+    else:
+      return(False)
+
+
+  def heartbeat(self,filepath):
+    """ Maintains a lock """
+    start = self.time.time()
+    while self.locks[filepath]:
+      lock = {}
+      lock['id'] = self.id
+      lock['filepath'] = filepath
+      lock['timestamp'] = self.time.time()
+      self.dump(lock,self.get_lock_file(filepath))
+      if not self.lock_life == None:
+        if (self.lock_life - start) <= 0:
+          self.locks['filepath'] = False
+      self.time.sleep(self.lock_poll)
+      if self.load(self.get_lock_file(filepath)) == False or not self.os.path.exists(self.get_lock_file(filepath)):
+        break
+
+
+  def lock(self,filepath):
+    """ Lock a given file """
+    filepath = self.os.path.abspath(filepath)
+    if not self.is_locked(filepath):
+      #get_lock_file(filepath)
+      self.locks[filepath] = True
+      self.threads[filepath] = self.threading.Thread(target=self.heartbeat,args=(filepath,))
+      (self.threads[filepath]).start()
+      return(True)
+    else:
+      return(False)
+    
+  def unlock(self,filepath):
+    filepath = self.os.path.abspath(filepath)
+    self.locks[filepath] = False
+    if self.os.path.isfile(self.get_lock_file(filepath)):
+      self.os.remove(self.get_lock_file(filepath))
+
+  def unlock_all(self):
+    for i in self.locks:
+      self.unlock(i)
+
+
+## Start locks
+flock = Flock()
+
+
+
 ## Prep dirs
 dirs = [settings['varlib'], settings['store'], settings['catalog'], settings['cache']]
 for dir in dirs:
@@ -61,9 +178,7 @@ def verbose(text, label='INFO'):
 
 ## Exit cleanup
 def cleanup():
-  global locks
-  for lock in locks:
-    (locks[lock]).release()
+  flock.unlock_all()
 
 ## Parses DSL Variables
 def dsl2opt(text, providerchar='@'):
@@ -210,14 +325,14 @@ class Image:
 
   def mount(self, link):
     imagefile = link
-    locks[imagefile] = lock = filelock.FileLock(imagefile)
-    while True:
-      try:
-        with locks[imagefile].acquire(timeout = 10):
-          break
-      except:
-        print('[ Lock ] File {} locked, waiting'.format(locks[imagefile]))
-        time.sleep(10)
+    while flock.is_locked(imagefile):
+      print('[ Lock ] File {} locked, waiting'.format(imagefile))
+      time.sleep(10)
+    if not flock.lock(imagefile):
+      print('[ Lock ] Cannot acquire {}'.format(imagefile))
+      sys.exit(1)
+    else:
+      print('[ Lock ] Acquired {}'.format(imagefile))
     mountdir = '%s_mount' % (imagefile)
     if not os.path.isdir(mountdir):
       try: os.makedirs(mountdir)
@@ -234,7 +349,7 @@ class Image:
     os.system('ls')
     os.system('pwd')
     os.chdir(mountdir)
-    (locks[imagefile]).release()
+    flock.unlock(imagefile)
 
 
   def unmount(self, link):
@@ -311,6 +426,13 @@ def build(marshal):
     if skip and delta:
       pass
     else:
+      while flock.is_locked(link['hash']) == True:
+        print('[ LOCK ] File {} locked, waiting'.format(link['hash']))
+        time.sleep(10)
+      if not flock.lock(link['hash']):
+        print('[ LOCK ] Cannot acquire {}'.format(link['hash']))
+        cleanup()
+        sys.exit(1)
       if settings['safedelta']:delta = False
       if not os.path.isfile(providerscript):
         if not find_executable(link['provider']) == None and settings['trycmd']:  ## Handles arbitrary commands
@@ -337,13 +459,16 @@ def build(marshal):
             del module
           if not marshal['status']:
             print('ERROR!')
+            cleanup()
             sys.exit(1)
       try: image.snapshot(link['last'], link['hash'])
       except: pass
+      flock.unlock(link['hash'])
   print('[FINISH] Execution time: %s'%(str(time.time() - starttime)))
 
   ## Finish,
   os.chdir(cwd)
+  cleanup()
   return(marshal)
 
 
