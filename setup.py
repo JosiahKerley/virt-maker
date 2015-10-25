@@ -41,7 +41,7 @@ if 'install' in sys.argv:
   for dir in install_dirs:
     if not os.path.isdir(dir):
       os.makedirs(dir)
-  with open('%s/virt-maker.py'%(here),'r') as f:
+  with open('%s/virt-maker/__init__.py'%(here),'r') as f:
     file_content = f.read()
   with open(install_file,'w') as f:
     f.write(file_content)
