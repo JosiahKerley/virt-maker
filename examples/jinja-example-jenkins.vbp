@@ -4,6 +4,7 @@ system:
   domain: localdomain
 apps:
   - epel-release
+  - nginx
   - jenkins
 nginx:
   ssl: true
@@ -28,7 +29,12 @@ ssl:
 @import centos-7.1.img
 @hostname {{ system.hostname }}.{{ system.domain }}
 @sysprep
-@install {{ apps|join(" ") }}
+@run curl -skL http://pkg.jenkins-ci.org/redhat/jenkins.repo > /etc/yum.repos.d/jenkins.repo
+@run rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+@run yum clean all
+{% for app in apps %}
+@install {{ app }}
+{% endfor %}
 
 
 ## Nginx
