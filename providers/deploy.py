@@ -11,11 +11,14 @@ defaults = {
 }
 def urlexists(urlstring):
   import requests
-  r = requests.get(urlstring)
-  if r.status_code == requests.codes.ok:
-    return(True)
-  else:
-    return(False)
+  try:
+    r = requests.get(urlstring)
+    if r.status_code == requests.codes.ok:
+      return(True)
+    else:
+      return(False)
+  except:
+      return(False)
 def downloadFile(urlstring,destination):
   import urllib2
   temp = destination+'.download'

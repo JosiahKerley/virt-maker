@@ -32,7 +32,7 @@ setup(
   author           = 'Josiah Kerley',
   author_email     = 'josiahkerley@gmail.com',
   url              = 'https://github.com/JosiahKerley/virt-maker',
-  install_requires = ['argparse','PyYAML','filelock','jinja2'],
+  install_requires = ['argparse','PyYAML','filelock','jinja2','requests'],
   zip_safe         = True
 )
 
