@@ -2,12 +2,39 @@ defaults = {
   "connect":"qemu:///system",
   #"virt-type":"kvm",
   "ram":"500",
-  "disk":"path=<[args]>,size=10",
+  "disk":"path=<[args]>",
   "network":"network=default",
   "graphics":"vnc",
   #"os-variant":"generic",
   "wait":"0",
 }
+def urlexists(urlstring):
+  import requests
+  r = requests.get(urlstring)
+  if r.status_code == requests.codes.ok:
+    return(True)
+  else:
+    return(False)
+def downloadFile(urlstring,destination):
+  import urllib2
+  temp = destination+'.download'
+  response = urllib2.urlopen(urlstring)
+  total_size = response.info().getheader('Content-Length').strip()
+  total_size = int(total_size)
+  bytes_so_far = 0
+  CHUNK = 16 * 1024
+  laststat = ''
+  with open(temp, 'wb') as f:
+    while True:
+      chunk = response.read(CHUNK)
+      if not chunk: break
+      f.write(chunk)
+      bytes_so_far += CHUNK
+      stat = str(int((bytes_so_far/total_size)*100))
+      if not stat == laststat:
+        print stat
+      laststat = stat
+  os.rename(temp,destination)
 import os
 def info():
   print('')
@@ -35,8 +62,14 @@ def build(marshal):
   cmdargs = ' '
   for i in defaults:
     cmdargs += ' --%s %s'%(i,defaults[i])
-  
-  if not os.path.isfile(args):
+  if urlexists(args):
+    print('Remote image found')
+    filename = args.split('/')[-1]
+    dest = '%s/%s'%(settings['cache'],filename)
+    if not os.path.isfile(dest):
+      downloadFile(args,dest)
+    args = dest
+  elif not os.path.isfile(args):
     storefile = '%s/%s'%(settings['store'],args)
     storefile = storefile.replace('//','/')
     if os.path.isfile(storefile):
