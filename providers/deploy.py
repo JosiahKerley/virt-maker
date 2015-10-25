@@ -1,5 +1,6 @@
 defaults = {
   "connect":"qemu:///system",
+  "image":False,
   #"virt-type":"kvm",
   "ram":"500",
   "disk":"path=<[args]>",
@@ -30,10 +31,10 @@ def downloadFile(urlstring,destination):
       if not chunk: break
       f.write(chunk)
       bytes_so_far += CHUNK
-      stat = str(int((bytes_so_far/total_size)*100))
-      if not stat == laststat:
-        print stat
-      laststat = stat
+      #stat = str(int((bytes_so_far/total_size)*100))
+      #if not stat == laststat:
+      #  print stat
+      #laststat = stat
   os.rename(temp,destination)
 import os
 def info():
@@ -59,23 +60,30 @@ def build(marshal):
       right = '='.join(line.split('=')[1:])
       defaults[left] = right
   if not 'name' in defaults: defaults['name'] = name
-  cmdargs = ' '
-  for i in defaults:
-    cmdargs += ' --%s %s'%(i,defaults[i])
   if urlexists(args):
     print('Remote image found')
     filename = args.split('/')[-1]
-    dest = '%s/%s'%(settings['cache'],filename)
+    if defaults['image']:
+      dest = defaults['image']
+      del defaults['image']
+    else:
+      dest = '%s/%s'%(settings['store'],filename)
+    print('Downloading to "%s"'%(dest))
     if not os.path.isfile(dest):
       downloadFile(args,dest)
     args = dest
   elif not os.path.isfile(args):
+    print('Local image found')
     storefile = '%s/%s'%(settings['store'],args)
     storefile = storefile.replace('//','/')
     if os.path.isfile(storefile):
       args = storefile
     else:
       print('No image file found.')
+  cmdargs = ' '
+  for i in defaults:
+    cmdargs += ' --%s %s'%(i,defaults[i])
+  
   imgfile = os.path.abspath(args)
   cmdargs = cmdargs.replace('<[args]>',imgfile)
   os.system('virsh destroy %s'%(defaults['name']))
