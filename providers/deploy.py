@@ -68,7 +68,6 @@ def build(marshal):
     filename = args.split('/')[-1]
     if defaults['image']:
       dest = defaults['image']
-      del defaults['image']
     else:
       dest = '%s/%s'%(settings['store'],filename)
     print('Downloading to "%s"'%(dest))
@@ -83,6 +82,7 @@ def build(marshal):
       args = storefile
     else:
       print('No image file found.')
+  del defaults['image']
   cmdargs = ' '
   for i in defaults:
     cmdargs += ' --%s %s'%(i,defaults[i])
