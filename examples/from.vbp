@@ -1,3 +1,4 @@
+#!/usr/bin/local/virt-maker -f
 ## Use a from
 @from simple.vbp
 @import simple-image

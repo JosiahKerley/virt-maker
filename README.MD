@@ -1,8 +1,3 @@
-Note:
-=====
-Be advised, this is still pretty early.  I'm still hammering out details with the DSL and provider modules (as well as things like whether or not I want to incorporate jinja2)
-Also been playing around with making a RESTful daemon for build automation.  Working on building a GUI around it for fun.
-
 
 About:
 ======
@@ -172,6 +167,8 @@ Examples:
 Create an nginx proxied rundeck server an deploy it with a macvtap
 
 ```
+#!/usr/bin/local/virt-maker -f
+##
 ##                         Build: virt-maker --build --file rundeck.vbp
 ##           Show variables used: virt-maker --file rundeck.vbp --show-variables --pretty
 ## Build with override variables: virt-maker --build --file rundeck.vbp --variables IPADDR=10.0.0.117 PREFIX=24 GATEWAY=10.0.0.1 HOSTDEV=ens32 DNS1=10.0.0.2 DNS2=10.0.0.1 

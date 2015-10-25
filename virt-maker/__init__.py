@@ -363,12 +363,28 @@ def post(marshal):
 
 
 
+## Fully resolves input
+def resolveYAMLJinja(text):
+  start = text
+  test = ''
+  data = {}
+  c = 0
+  while not start == test:
+    c += 1
+    data = yaml.load(start)
+    test = jinja2.Environment().from_string(start).render(data)
+    if c >= 255: break
+  return(test)
+
+
 
 ## Jinja handler
 def handle_jinja(text):
   """ Handles parsing the Jinja DSL """
   template = '\n@'+text.split('\n@',1)[-1] ## Breaks out the YAML from the DSL
-  text = text.replace(template,'')       ##
+  text = text.replace(template,'')         ##
+  text = resolveYAMLJinja(text)  ## Jumps the YAML's internal jinja-ness
+  if '-s' in sys.argv: print text # Need to integrate into argparse
   buff = ''                                     ## Stream loads the YAML
   for line in text.split('\n'):                 ##
     if not line.startswith('#'):                ##

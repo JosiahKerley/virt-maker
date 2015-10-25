@@ -1,3 +1,5 @@
+#!/usr/bin/local/virt-maker -f
+
 ## CentOS based gateway
 
 

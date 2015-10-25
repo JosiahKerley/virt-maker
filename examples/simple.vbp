@@ -1,3 +1,4 @@
+#!/usr/bin/local/virt-maker -f
 ## Simple Example
 @virt-builder centos-6
 @import centos-6.img
