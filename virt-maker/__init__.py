@@ -648,7 +648,7 @@ elif results.providers:
     for i in files:
       print i
 elif results.flushcache:
-  cmd = 'rm -rf "%s/*"'%(settings['cache'])
+  cmd = 'find "%s/" -type f -exec rm -rf {} \; ;'%(settings['cache'])
   os.system(cmd)
 else:
   raise('No input file specified')
