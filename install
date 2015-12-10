@@ -2,6 +2,7 @@
 BIN_PREFIX='/usr/local/bin'
 LIB_PREFIX='/var/lib/virt-maker'
 PYTHON_PREFIX='/usr/lib/python2.7/site-packages'
+PACKER_FILE='packer_0.8.6_linux_amd64.zip'
 
 
 function main() {
@@ -12,7 +13,7 @@ function main() {
 }
 
 function pkgSetup() {
-  cat virt-maker.py > ${BIN_PREFIX}/virt-maker;
+  cat virt-maker/__init__.py > ${BIN_PREFIX}/virt-maker;
   chmod 1750 ${BIN_PREFIX}/virt-maker;
   chown root:libvirt ${BIN_PREFIX}/virt-maker;
 
@@ -29,9 +30,9 @@ function packerSetup() {
     APP=packer
     TEMP=$(mktemp -p /tmp -d ${APP}-XXXX);
     cd ${TEMP};
-    wget "https://dl.bintray.com/mitchellh/packer/packer_0.7.5_linux_amd64.zip"
-    unzip packer_0.7.5_linux_amd64.zip;
-    rm -f packer_0.7.5_linux_amd64.zip;
+    wget "https://dl.bintray.com/mitchellh/packer/${PACKER_FILE}"
+    unzip ${PACKER_FILE};
+    rm -f ${PACKER_FILE};
     sudo cp -f packer* ${BIN_PREFIX};
     rm -rf ${TEMP};
   fi;

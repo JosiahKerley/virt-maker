@@ -18,6 +18,8 @@ def build(marshal):
     pass
   elif os.path.isfile('%s/%s'%(settings['store'],args)):
     args = '%s/%s'%(settings['store'],args)
+  elif os.path.isfile('%s/%s'%(os.getenv('PWD'),args)):
+    args = '%s/%s'%(os.getenv('PWD'),args)
   else:
     print('Cannot find "%s"'%(args))
   if verbose:
