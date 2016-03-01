@@ -29,7 +29,7 @@ def build(marshal):
   with open(filename,'w') as f: f.write(body)
 
   ## Parse args
-  if args == "":
+  if args == "" or args == "script":
     args = False
     if verbose:
       cmd = 'virt-customize --run "%s" -a %s'%(filename,hash)
