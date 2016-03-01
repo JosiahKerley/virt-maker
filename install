@@ -46,6 +46,7 @@ function pythonDeps() {
   if ! ls ${PYTHON_PREFIX}/redis; then pip install redis; fi;
   if ! ls ${PYTHON_PREFIX}/pexpect; then pip install pexpect; fi;
   if ! ls ${PYTHON_PREFIX}/flask; then pip install flask; fi;
+  yum install -y gcc python-devel
 }
 
 function cleanup() {
