@@ -24,7 +24,18 @@ setup(
   author           = 'Josiah Kerley',
   author_email     = 'josiahkerley@gmail.com',
   url              = 'https://github.com/JosiahKerley/virt-maker',
-  install_requires = ['argparse','PyYAML','filelock','jinja2','requests']
+  install_requires = [
+    'argparse',
+    'PyYAML',
+    'filelock',
+    'jinja2',
+    'requests',
+    'python-swiftclient',
+    'python-glanceclient',
+    'python-cinderclient',
+    'python-novaclient',
+    'python-neutronclient'
+  ]
 )
 
 ## Copy
