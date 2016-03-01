@@ -33,8 +33,7 @@ setup(
     'python-swiftclient',
     'python-glanceclient',
     'python-cinderclient',
-    'python-novaclient',
-    'python-neutronclient'
+    'python-novaclient'
   ]
 )
 
