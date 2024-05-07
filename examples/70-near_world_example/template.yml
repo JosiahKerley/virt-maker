@@ -1,0 +1,8 @@
+params:
+  hostname: 70-near_world_example
+  export_path: 'images/{{ hostname }}.qcow2'
+from: examples/70-near_world_example/base.yml
+to: examples/70-near_world_example/finalize.yml
+spec:
+  steps:
+    - hostname: '{{ hostname }}'

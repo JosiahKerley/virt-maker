@@ -1,0 +1,10 @@
+colorama==0.4.6
+Jinja2==3.1.2
+PyYAML==6.0.1
+psutil==5.9.5
+vncdotool==1.2.0
+pytesseract==0.3.10
+pillow==10.3.0
+jsonschema==4.21.1
+jsonschema-specifications==2023.12.1
+fuzzywuzzy==0.18.0

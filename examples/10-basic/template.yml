@@ -1,0 +1,14 @@
+spec:
+  import:
+    virt-builder:
+      image: centos-7.8
+      size: 6G
+  steps:
+    - run: yum clean all
+    - run: |
+        date > /etc/build-date
+    - firstboot: yum update -y
+    - hostname: 10-basic
+  export:
+    qcow2:
+      path: images/10-basic.qcow2

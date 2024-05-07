@@ -1,0 +1,18 @@
+params:
+  hostname: 71-using_cloudimage
+  export_path: 'images/{{ hostname }}.qcow2'
+  size: 10G
+spec:
+  import:
+    download:
+      url: https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud.latest.x86_64.qcow2
+      resize:
+        size: '{{ size }}'
+        expand: /dev/sda5
+  steps:
+    - run: dnf clean all
+    - firstboot: dnf update -y
+    - hostname: '{{ hostname }}'
+  export:
+    qcow2:
+      path: '{{ export_path }}'

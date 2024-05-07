@@ -1,5 +1,0 @@
-#!/bin/bash
-yum clean all
-#yum install -y PyYAML python-netifaces python-requests python-setuptools
-yum install -y PyYAML python-netifaces python-setuptools
-python setup.py install

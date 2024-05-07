@@ -1,0 +1,6 @@
+params:
+  export_path: images/60-to_and_from.qcow2
+spec:
+  export:
+    qcow2:
+      path: '{{ export_path }}'

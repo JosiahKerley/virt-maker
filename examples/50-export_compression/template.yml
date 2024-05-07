@@ -1,0 +1,12 @@
+params:
+  export_path: images/50-export_compression.qcow2.lz
+spec:
+  import:
+    virt-builder:
+      image: centos-7.8
+      size: 6G
+  export:
+    qcow2:
+      path: '{{ export_path }}'
+      compress: lz4
+      level: 1

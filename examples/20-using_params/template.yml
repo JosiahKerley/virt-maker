@@ -1,0 +1,17 @@
+params:
+  image: centos-7.8
+  size: 6G
+  hostname: 20-using_params
+  export_path: 'images/{{ hostname }}.qcow2'
+spec:
+  import:
+    virt-builder:
+      image: '{{ image }}'
+      size: '{{ size }}'
+  steps:
+    - run: yum clean all
+    - firstboot: yum update -y
+    - hostname: '{{ hostname }}'
+  export:
+    qcow2:
+      path: '{{ export_path }}'

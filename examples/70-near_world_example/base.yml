@@ -1,0 +1,17 @@
+spec:
+  import:
+    virt-builder:
+      image: centos-7.8
+      size: 6G
+  steps:
+    - run: yum clean all
+    - run: yum update -y
+    - install:
+        - epel-release
+    - install:
+        - vim
+        - nano
+        - tmux
+        - htop
+        - mlocate
+    - firstboot: updatedb
