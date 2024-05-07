@@ -1,0 +1,23 @@
+params:
+  export_path: 'images/40-export_scripts/{{ year() }}-{{ month() }}-{{ day() }}.qcow2'
+spec:
+  import:
+    virt-builder:
+      image: centos-7.8
+      size: 6G
+  export:
+    qcow2:
+      path: '{{ export_path }}'
+      pre_script: |
+        #!/usr/bin/python
+        import os
+        dirname = os.path.dirname('{{ export_path }}')
+        print(dirname)
+        if not os.path.isdir(dirname):
+          os.makedirs(dirname)
+      post_script: |
+        #!/bin/bash
+        cd `dirname {{ export_path }}`
+        which lz4c && lz4c -f -1 *.qcow2
+        which xz && xz -f -k -9 -T0 *.qcow2
+        du -sh ./

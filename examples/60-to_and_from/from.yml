@@ -1,0 +1,5 @@
+spec:
+  import:
+    virt-builder:
+      image: centos-7.8
+      size: 6G

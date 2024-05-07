@@ -1,0 +1,7 @@
+spec:
+  steps:
+    - run: touch /.autorelabel
+    - firstboot: reboot
+  export:
+    qcow2:
+      path: '{{ export_path }}'

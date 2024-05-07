@@ -1,0 +1,20 @@
+params:
+  image: centos-7.8
+  size: 6G
+  hostname: '{{ random_hostname() }}'
+  export_path: 'images/30-using_filters/{{ hostname }}.qcow2'
+spec:
+  import:
+    virt-builder:
+      image: '{{ image }}'
+      size: '{{ size }}'
+  steps:
+    - run: yum clean all
+    - firstboot: yum update -y
+    - run: |
+        echo '{{ random_word(max_length=100) }}' > /random_word
+    - hostname: '{{ hostname }}'
+  export:
+    qcow2:
+      path: '{{ export_path }}'
+      create_dir: true

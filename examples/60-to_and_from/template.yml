@@ -1,0 +1,7 @@
+params:
+  hostname: 60-to_and_from
+from: examples/60-to_and_from/from.yml
+to: examples/60-to_and_from/to.yml
+spec:
+  steps:
+    - hostname: '{{ hostname }}'

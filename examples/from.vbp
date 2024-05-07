@@ -1,7 +1,0 @@
-#!/usr/bin/local/virt-maker -f
-## Use a from
-@from simple.vbp
-@import simple-image
-@hostname from-test
-@store from-test
-@catalog
