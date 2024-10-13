@@ -7,6 +7,19 @@ from virtmaker.utils.cmd import runCmd
 
 class Copy(VirtCustomize):
     _tag = "copy"
+    _spec_schema = {
+        "title": "step-copy",
+        "type": "object",
+        "properties": {
+            "dest": {"type": "string", "format": "valid-posix-path-string"},
+            "content": {"type": "string"},
+            "simple": {"type": "boolean"},
+            "chmod": {"type": "integer"},
+            "chown": {"type": "string"}
+        },
+        "required": ["dest", "content"],
+        "additionalProperties": False
+    }
 
     @classmethod
     def _validate_step_spec(cls, spec):
@@ -40,10 +53,12 @@ class Copy(VirtCustomize):
         else:
             local_file_path = self._copy_local_file(self._spec_config['content'])
 
-        if self._spec_config.get('simple', False):
-            return ['--copy-in', f'{local_file_path}:{self._dest_dir}']
-        else:
-            return ['--run-command', f'cp {local_file_path} {self._dest_dir}']
+        ## TODO: Need to re-evaulate this
+        #if self._spec_config.get('simple', False):
+        #    return ['--copy-in', f'{local_file_path}:{self._dest_dir}']
+        #else:
+        #    return ['--run-command', f'cp {local_file_path} {self._dest_dir}']
+        return ['--copy-in', f'{local_file_path}:{self._dest_dir}']
 
     def _write_local_file(self):
         local_file_path = os.path.join(self._cache_dir, self._signature)
@@ -88,3 +103,4 @@ class Copy(VirtCustomize):
                     return False
             return True
         return True
+

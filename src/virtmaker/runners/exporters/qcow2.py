@@ -32,6 +32,7 @@ class QCOW2(Exporter):
                 "maximum": 9,
                 "default": 1
             },
+            "sparsify": {"type": "boolean", "default": False},
             "pre_script": {"type": "string"},
             "post_script": {"type": "string"}
         },
@@ -67,14 +68,17 @@ class QCOW2(Exporter):
             return False
 
     def _run(self):
-        ## TODO: This shouldnt be needed now that the schema is being used
-        # if not 'level' in self._spec_config.keys():
-        #     self._spec_config['level'] = 1
         if 'create_dir' in self._spec_config.keys():
             if self._spec_config['create_dir'] and not os.path.isdir(os.path.dirname(self._spec_config['path'])):
                 os.makedirs(os.path.dirname(self._spec_config['path']))
         tmp_filepath = os.path.join(self._cache_dir, self._signature+'_in-progress')
-        cmds = [f'TMPDIR={self._cache_dir} virt-sparsify --convert={self._virt_sparsify_convert} "{self.disk_image_filepath}" "{tmp_filepath}"']
+        if 'sparsify' in self._spec_config.keys() and self._spec_config['sparsify'] or self._spec_config['sparsify'] == None:
+            if 'compress' in self._spec_config.keys():
+                cmds = [f'TMPDIR={self._cache_dir} virt-sparsify --convert={self._virt_sparsify_convert} "{self.disk_image_filepath}" "{tmp_filepath}"']
+            else:
+                cmds = [f'TMPDIR={self._cache_dir} virt-sparsify --compress --convert={self._virt_sparsify_convert} "{self.disk_image_filepath}" "{tmp_filepath}"']
+        else:
+            cmds = [f'TMPDIR={self._cache_dir} qemu-img convert -p -O qcow2 "{self.disk_image_filepath}" "{tmp_filepath}"']
         if 'compress' in self._spec_config.keys():
             if self._spec_config['compress'] == 'lz4':
                 level = 1
@@ -99,12 +103,10 @@ class QCOW2(Exporter):
                 else:
                     cmds += [f"gzip -{level} -c '{tmp_filepath}' > '{tmp_filepath}.gz'"]
                 cmds += [f"mv -f '{tmp_filepath}.gz' '{tmp_filepath}'"]
-        else:
-            cmds += [f'TMPDIR={self._cache_dir} virt-sparsify --compress "{tmp_filepath}" "{tmp_filepath}.compressed"',
-                     f"mv -f '{tmp_filepath}.compressed' '{tmp_filepath}'"]
         for cmd in cmds:
             if not runCmd(cmd):
                 raise Exception(f'failed executing {cmd}')
         if os.path.dirname(self._spec_config['path']) and not os.path.isdir(os.path.dirname(self._spec_config['path'])):
             os.makedirs(os.path.dirname(self._spec_config['path']))
         return shutil.move(tmp_filepath, self._spec_config['path'])
+
