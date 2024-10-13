@@ -60,7 +60,7 @@ class Boot(Step):
 
     def _run(self):
         if shutil.which('qemu-system-x86_64'):
-            cmd = f'qemu-system-x86_64 {self.disk_image_filepath}'
+            cmd = f'qemu-system-x86_64 -enable-kvm {self.disk_image_filepath}'
             if self._spec_config and 'display' in self._spec_config.keys():
                 cmd += f" -display {self._spec_config['display']}"
             if self._spec_config and 'cpu' in self._spec_config.keys():
@@ -95,3 +95,4 @@ class Boot(Step):
                         cmd += " "+_
         self._last_result = runCmd(cmd)
         return self._last_result
+

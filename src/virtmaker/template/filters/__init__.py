@@ -21,6 +21,15 @@ def filter_month():
 def filter_day():
     return date.today().strftime("%d")
 
+def filter_hour():
+    return datetime.now().strftime("%H")
+
+def filter_minute():
+    return datetime.now().strftime("%M")
+
+def filter_second():
+    return datetime.now().strftime("%S")
+
 def filter_now():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -99,3 +108,4 @@ def filter_from_yaml(yaml_string):
 
 def filter_download(url, filepath):
     return download_file(url, filepath)
+
