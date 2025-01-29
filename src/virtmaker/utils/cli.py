@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# (c) 2015-2024, Josiah Kerley <josiahkerley@gmail.com>
+# (c) 2015-2025, Josiah Kerley <josiahkerley@gmail.com>
 #
 # This file is part of Virt Maker.
 #
