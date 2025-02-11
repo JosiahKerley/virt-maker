@@ -15,7 +15,9 @@ class SELinux(Run):
 
     def _write_local_file(self):
         if self._spec_config == 'relabel':
-            self._virt_customize_first_arg = '--selinux-relabel'
+            print('FINDME')
+            self._relabel_opt = '--selinux-relabel'
+            self._virt_customize_first_arg = ''
             return ''
         else:
             cmd = f"sed -i 's/^SELINUX=.*$/SELINUX={self._spec_config}/' /etc/selinux/config"
