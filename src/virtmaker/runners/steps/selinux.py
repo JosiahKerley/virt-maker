@@ -1,3 +1,4 @@
+## TODO:  Reimplement this as SELinux(VirtCustomize)
 import os
 from virtmaker.runners.steps.run import Run
 
@@ -15,10 +16,12 @@ class SELinux(Run):
 
     def _write_local_file(self):
         if self._spec_config == 'relabel':
-            print('FINDME')
             self._relabel_opt = '--selinux-relabel'
-            self._virt_customize_first_arg = ''
-            return ''
+            cmd = f"cat /etc/selinux/config"
+            local_file_path = os.path.join(self._cache_dir, self._signature)
+            with open(local_file_path, 'w') as f:
+                f.write(cmd)
+            return local_file_path
         else:
             cmd = f"sed -i 's/^SELINUX=.*$/SELINUX={self._spec_config}/' /etc/selinux/config"
             local_file_path = os.path.join(self._cache_dir, self._signature)
