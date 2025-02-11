@@ -78,7 +78,7 @@ class QCOW2(Exporter):
             else:
                 cmds = [f'TMPDIR={self._cache_dir} virt-sparsify --compress --convert={self._virt_sparsify_convert} "{self.disk_image_filepath}" "{tmp_filepath}"']
         else:
-            cmds = [f'TMPDIR={self._cache_dir} qemu-img convert -p -O qcow2 "{self.disk_image_filepath}" "{tmp_filepath}"']
+            cmds = [f'TMPDIR={self._cache_dir} qemu-img convert -p -O {self._virt_sparsify_convert} "{self.disk_image_filepath}" "{tmp_filepath}"']
         if 'compress' in self._spec_config.keys():
             if self._spec_config['compress'] == 'lz4':
                 level = 1
