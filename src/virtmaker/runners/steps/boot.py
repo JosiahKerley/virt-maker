@@ -23,6 +23,7 @@ class Boot(Step):
             "cpu": {"type": "string", "default": "host", "enum": ["host"]},
             "cpus": {"type": "number", "default": 2},
             "memory": {"type": "number", "default": 2048},
+            "serial": {"type": "boolean", "default": True},
             "opts": {
                 "type": "array",
                 "items": {
@@ -73,6 +74,8 @@ class Boot(Step):
                 cmd += f" -smp {self._qemu_system_options['cpus']}"
             if self._spec_config and 'memory' in self._spec_config.keys():
                 cmd += f" -m {self._spec_config['memory']}"
+            if self._spec_config and 'serial' in self._spec_config.keys() and self._spec_config['serial']:
+                cmd += f" -serial mon:stdio"
             else:
                 cmd += f" -m {self._qemu_system_options['memory']}"
         elif shutil.which('/usr/libexec/qemu-kvm'):
@@ -89,6 +92,8 @@ class Boot(Step):
                 cmd += f" -m {self._spec_config['memory']}"
             else:
                 cmd += f" -m {self._qemu_system_options['memory']}"
+            if self._spec_config and 'serial' in self._spec_config.keys() and self._spec_config['serial']:
+                cmd += f" -serial mon:stdio"
             if self._spec_config and 'opts' in self._spec_config.keys():
                 for opt in  self._spec_config['opts']:
                     for _ in opt:
