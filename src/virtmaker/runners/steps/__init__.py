@@ -3,7 +3,7 @@ from virtmaker.runners import Runner
 class Step(Runner):
     _tag = 'step'
     _valid_keys = ['run', 'firstboot', 'copy', 'install', 'hostname', 'ssh_keygen', 'selinux', 'boot', 'grub_append',
-                   'local_run', 'sysprep', 'inject_virtio_win', 'inject_qemu_ga', 'rootpass']
+                   'local_run', 'sysprep', 'inject_virtio_win', 'inject_qemu_ga', 'rootpass', 'expand']
 
     @classmethod
     def load(cls, spec_stanza, previous=None, image_name=None):
@@ -50,6 +50,9 @@ class Step(Runner):
             if step_name == "rootpass":
                 from .rootpass import RootPass
                 return RootPass(spec_stanza['rootpass'], previous=previous, image_name=image_name)
+            if step_name == "expand":
+                from .expand import Expand
+                return Expand(spec_stanza['expand'], previous=previous, image_name=image_name)
             raise Exception(f'No step class found for {step_name}')
 
     @classmethod
