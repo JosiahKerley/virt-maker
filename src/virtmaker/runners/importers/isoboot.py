@@ -1,5 +1,6 @@
 import os.path
 import shutil
+import subprocess
 
 from virtmaker import config
 from virtmaker.runners.importers import Importer
@@ -13,7 +14,7 @@ class ISOBoot(Importer):
                          "Please do not use ISOBOOT for production builds until the api has stabilized."]
     _tag = "isoboot"
     _required_commands = [['qemu-system-x86_64', '/usr/libexec/qemu-kvm'],
-                          ['pv', 'cp'], ['mkfs.msdos'], ['mcopy'], ['qemu-img'], ['wget']]
+                          ['pv', 'cp'], ['mkfs.msdos'], ['qemu-img'], ['wget'], ['mkfs.exfat'], ['guestfish'], ['virt-format']]
 
     _spec_schema = {
         "title": "import-isoboot",
@@ -41,6 +42,40 @@ class ISOBoot(Importer):
                 "items": {
                     "type": "object",
                     "additionalProperties": {"type": "string"}
+                }
+            },
+            "data_disks": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "string",
+                            "format": "data-size-format",
+                            "default": "10G"
+                        },
+                        "filesystem": {
+                            "type": "string",
+                            "enum": ["ext3"],
+                            "default": "ext3"
+                        },
+                        "interface": {
+                            "type": "string",
+                            "enum": ["virtio", "ide", "scsi"],
+                            "default": "virtio"
+                        },
+                        "files": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {"type": "string"}
+                            }
+                        }
+                    },
+                    "required": ["size"]
                 }
             },
             "keystrokes": {
@@ -93,7 +128,6 @@ class ISOBoot(Importer):
         iso_filename = url.split('/')[-1]
         iso_filepath = os.path.join(self._cache_dir, iso_filename)
         orig_iso_filepath = iso_filepath
-        # ['http://', 'https://', 'ftp://', 'sftp://', 'file://']
         if shutil.which("pv"):
             stream_cmd = 'pv'
         else:
@@ -138,6 +172,7 @@ class ISOBoot(Importer):
         timeout = self._spec_config.get('timeout', 3600)
         extra_opts = self._spec_config.get('extra_opts', '')
         floppies = self._spec_config.get('floppies', [])
+        data_disks = self._spec_config.get('data_disks', [])
         isos = self._spec_config.get('isos')
         cmds = []
         opts = ''
@@ -168,6 +203,31 @@ class ISOBoot(Importer):
             iso_filepath, retval = self._prep_file(iso)
             assert retval
             opts += f" -drive file={iso_filepath},if=ide,index={idx},media=cdrom "
+        for idx, disk in enumerate(data_disks):
+            diskname = f'data_disk{idx}.qcow2'
+            diskpath = os.path.realpath(os.path.join(self._cache_dir, diskname))
+            cmds.append(f"qemu-img create -f qcow2 {diskpath} {disk['size']}")
+            if 'label' in disk:
+                cmds.append(f"virt-format --label {disk['label']} --filesystem {disk['filesystem']} -a {diskpath}")
+            else:
+                cmds.append(f"virt-format --filesystem {disk['filesystem']} -a {diskpath}")
+            if 'files' in disk:
+                tmp_dir_contents = os.path.join(self._cache_dir, f"disk{idx}_contents")
+                if os.path.isdir(tmp_dir_contents):
+                    shutil.rmtree(tmp_dir_contents)
+                os.makedirs(tmp_dir_contents)
+                files_to_copy = []
+                for file in disk['files']:
+                    for filepath, content in file.items():
+                        full_filepath = os.path.join(tmp_dir_contents, filepath)
+                        files_to_copy.append(full_filepath)
+                        full_filepath_dirname = os.path.dirname(full_filepath)
+                        if not os.path.isdir(full_filepath_dirname):
+                            os.makedirs(full_filepath_dirname)
+                        with open(full_filepath, 'w') as f:
+                            f.write(content)
+                cmds += [f"guestfish --rw -a {diskpath} --mount /dev/sda1 copy-in {' '.join(files_to_copy)} /"]
+            opts += f" -drive file={diskpath},if={disk.get('interface', 'virtio')},index={idx+len(isos)},media=disk "
         qemu_system_cmds = ["/usr/bin/qemu-system-x86_64", "/usr/libexec/qemu-kvm"]
         for cmd in qemu_system_cmds:
             if os.path.isfile(cmd):
