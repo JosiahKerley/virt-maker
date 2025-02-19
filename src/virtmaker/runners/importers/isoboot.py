@@ -14,7 +14,7 @@ class ISOBoot(Importer):
                          "Please do not use ISOBOOT for production builds until the api has stabilized."]
     _tag = "isoboot"
     _required_commands = [['qemu-system-x86_64', '/usr/libexec/qemu-kvm'],
-                          ['pv', 'cp'], ['mkfs.msdos'], ['qemu-img'], ['wget'], ['mkfs.exfat'], ['guestfish'], ['virt-format']]
+                          ['pv', 'cp'], ['mkfs.msdos'], ['qemu-img'], ['wget'], ['guestfish'], ['virt-format']]
 
     _spec_schema = {
         "title": "import-isoboot",
